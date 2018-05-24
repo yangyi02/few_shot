@@ -5,3 +5,4 @@ tensorboard
 viper/train
 viper/val
 mlt/box
+.DS_Store
