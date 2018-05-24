@@ -1,10 +1,32 @@
-# few_shot
+# Unsupervised Learning Depth and Optical Flow to Help Few Shot Supervised Learning.
 
 ## Requirement
-PyTorch 0.3.1
-Python 2.x
+- PyTorch 0.3.1
+- Python 2.x
 
-# 6/7
+## Motivation
+- This is a backup of the research for studying the effect of depth, optical flow and top-down keywords for object recognition in cluttered scenes.
+- There is an intuition that depth and optical can significantly help attention and recognition for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the correct region pointed by keywords.
+- And this work is to study how much depth and optical flow can help.
+- For the depth and optical flow data, we simply use ground truth that the dataset obtains. However, one can also use the unsupervisedly trained depth and optical flow estimation from [Other works](https://arxiv.org/abs/1711.05890).
+
+## Dataset
+- We mainly use three datasets for experiments.
+1. Mnist dataset: This is simply for debug model and code.
+2. [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/): This is the main dataset we use to study depth effect because they contain ground truth object semantic segmentation, instance segmentation, depth, etc.
+3. [VIPER dataset](http://playing-for-benchmarks.org/): This is the main dataset we use to study optical flow effect because they contain ground truth object semantic segmentation, instance segmentation, optical flow, etc.
+4. [KITTI dataset](http://www.cvlibs.net/datasets/kitti/): The final dataset we are planning to use is the well known KITTI benchmark dataset, but so far for simplisity, we haven't used it yet.
+
+## Benchmark & Criteria
+- Since our ultimate goal is to demonstrate that depth and optical flow can facilitate the high level semantic level tasks such as recognition and feedback attention, our problem setting is below:
+1. Given a direction keyword and a cluttered RGB image (+ depth & optical flow), how is the recognition accuracy?
+2. Given an object keyword and a cluttered RGB image (+ depth & optical flow), how is the localization (attention) accuracy?
+3. Given few supervised training labels, how does the unsupervised (depth & optical flow) help recognition / localization accuracy?
+
+## Model
+- We find it is straightforward to use the attention model to conduct the experiments. There are two variations of attention models: (1) Hard attention model such as [Spatial Transformer Networks](http://torch.ch/blog/2015/09/07/spatial_transformers.html) and [Recurrent Model of Visual Attention](http://torch.ch/blog/2015/09/21/rmva.html), (2) Soft attention model such as [Show, Attend and Tell](http://kelvinxu.github.io/projects/capgen.html). In this work, we also study the effect of these two different attention models on the recognition and localization tasks.
+
+## Preliminary Results
 - Working on soft-attention model and switch back to MLT dataset because Mnist dataset is too simple.
 - On MLT dataset, there are two main promising conclusions: 
 1. Adding depth significantly helps image recognition. For example, the testing recognition accuracy increases from 42% to 48% by adding depth. And after adding top-down direction signal, the testing accuracy further increases from 48% to 72% which is about 30% total absolute improvement to the baseline RGB only.
@@ -13,8 +35,6 @@ Python 2.x
 ![图片](http://agroup-bos.su.bcebos.com/0b5775a0f23d4d1db745f4bcc24b7c0f0d305def =200x)![图片](http://agroup-bos.su.bcebos.com/f8fc486d01fe3719104026689c98375ee1b98253 =300x)![图片](http://agroup-bos.su.bcebos.com/49fed034e407f5a60f0c43e2c1d316e035e5c0a0 =300x)![图片](http://agroup-bos.su.bcebos.com/6ded1b6986cefbb260182cd2ba4350ca0c78db5b =300x)![图片](http://agroup-bos.su.bcebos.com/35c1c04f6ba43db379795bccf046951c114f05b1 =300x)
 - An illustration of the soft attention model
 ![图片](http://agroup-bos.su.bcebos.com/204783d4733b98323d66b51c45708fd91dd6b1ec =300x)![图片](http://agroup-bos.su.bcebos.com/818b3f6e995da4998c76af0c1b22f65b66470223 =300x)![图片](http://agroup-bos.su.bcebos.com/9872c29f00468d9a547280780a50aec54af3a60f =300x)
-
-# 5/31
 
 - Conduct comparison between hard attention model and soft attention model on Mnist dataset. Conclusion: using soft attention model performs much more smoother and faster convergence compared to previous hard attention (spatial transformer networks). The oracle performance of soft attention model may be slightly worse than the best hard attention model on recognition, however, in reality training converges much smoother.
 - Here I show the training convergence using the soft attention model and a baseline hard attention model (orange) on Mnist dataset. One can see the three (red, cyan, gray) soft-attention curves all converge much faster than the (orange) hard-attention (spatial transformer networks) curve. For more hard attention model performances, please see the last week (5/24/2018) note.
@@ -26,22 +46,17 @@ Python 2.x
 - The attention model (spatial transformer networks) can work now on Mnist dataset, when Mnist digits are randomly uniformly located in the image. Both image-based attention and word-based attention can provide reasonable attention. Jointly train them can achieve even better and faster convergence on learning classifiers and attention models.
 ![图片](http://agroup-bos.su.bcebos.com/177aa3624fc93d8fb52e8b267d86e98c62987920 =200x)![图片](http://agroup-bos.su.bcebos.com/2f8ecbe0baf20a9b5f20e90538795060cc5881ba =300x)![图片](http://agroup-bos.su.bcebos.com/ee4d310b6d7507d970a64b753383e02c0a72ec2c =300x)![图片](http://agroup-bos.su.bcebos.com/de3f8bc73cf1e511a555a010ecf03af1b6ffaa5b =300x)![图片](http://agroup-bos.su.bcebos.com/a3a107023579fb7b786651092108ef083f518211 =300x)
 
-# 5/17
-
 - The attention model (spatial transformer networks) does not work on MLT dataset so far. 
 - I find the model struggling in finding the correct object location, and is very sensitive to initialization.
 - Debug attention networks on Mnist dataset-
  and find it even fails on simple Mnist data. Below is an illustration
 ![图片](http://agroup-bos.su.bcebos.com/669cf37528c33dbe6bfdeb17706029266d354bca =150x)![图片](http://agroup-bos.su.bcebos.com/5da9af8a06b082bbfd2b10f1280def220b1a0e00 =150x)![图片](http://agroup-bos.su.bcebos.com/4ee19733467d37c4e9cb8d5f6be85779127699c8 =195x)![图片](http://agroup-bos.su.bcebos.com/fddeede4cc4e75afff97aab60940453453631212 =195x)
 
-# 5/10
 - Start to involve attention models to recognize objects. Previously we manually crop the image patch based on the bounding box. Now we use spatial transformer networks to crop the image based on the bounding box.
 - To make training/testing more stable, now use 10742 training images and 4605 testing images, 6 classes on [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/).
 - Performance summarization: Random guess is 25%, brute-forcely train with only image 40%, brute-forcely train image with box 62%, suggesting a high location prior in the image, spatial transformer attention crop with gt box 69%.
 ![图片](http://agroup-bos.su.bcebos.com/0652334e97021dcdaad1bf2e706f32cbaf3ab34b =300x)
 
-
-# 5/3
 
 - Summarize the performance of using the bounding box to align v.s. no aligned, and using RGB + depth v.s. RGB only, on [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/), with 7000 training images and 700 testing images, 6 classes. 
 - Try to train a residual network to beat the previous VGG network, but residual network obtains worse performance on all different tasks. Will figure out why.
