@@ -39,7 +39,7 @@ We find it is straightforward to use the attention models to conduct the experim
 - Summarize the performance of using the bounding box to align v.s. no aligned and using RGB + depth v.s. RGB only, on [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/) with 7000 training images and 700 testing images for 6 most frequent classes. 
 - Try to train a residual network to beat the previous VGG network, but residual network obtains worse performance on all different tasks. Need to figure out why.
 
-| <img src="figures/05-03/rgb_only.png" width="200"> | <img src="figures/05-03/rgb_depth.png" width="200"> | <img src="figures/05-03/rgb_vs_depth.png" width="200"> | <img src="figures/05-03/unaligned_vs_aligned.png" width="200"> |
+<img src="figures/05-03/rgb_only.png" width="200"> <img src="figures/05-03/rgb_depth.png" width="200"> <img src="figures/05-03/rgb_vs_depth.png" width="200"> <img src="figures/05-03/unaligned_vs_aligned.png" width="200"> 
 
 ### 5/10/2018
 - To make training/testing more stable, we now use 10742 training images and 4605 testing images for 6 most frequent classes on [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/).
@@ -50,26 +50,19 @@ We find it is straightforward to use the attention models to conduct the experim
 - The hard attention model (Spatial Transformer Networks) does not work on MLT dataset so far. I find the model struggling in finding the correct object location and is very sensitive to initialization.
 - Debug Spatial Transformer Networks on Mnist dataset and find it even fails on simple Mnist data.
  
-<img src="figures/05-17/mnist_1.png" width="100">
-<img src="figures/05-17/mnist_2.png" width="100">
-<img src="figures/05-17/mlt_1.png" width="133">
-<img src="figures/05-17/mlt_2.png" width="133">
+<img src="figures/05-17/mnist_1.png" width="100"> <img src="figures/05-17/mnist_2.png" width="100"> <img src="figures/05-17/mlt_1.png" width="133"> <img src="figures/05-17/mlt_2.png" width="133">
 
 ### 5/24/2018
 - The Spatial Transformer Networks can work on Mnist dataset now, when Mnist digits are randomly uniformly located in the image. Both image-based attention and word-based attention can provide reasonable attention. Jointly training with them can achieve even better and faster convergence on learning classifiers and attention models.
 
-<img src="figures/05-24/legend.png" width="100">
-<img src="figures/05-24/train_accuracy.png" width="200">
-<img src="figures/05-24/test_accuracy.png" width="200">
+<img src="figures/05-24/legend.png" width="100"> <img src="figures/05-24/train_accuracy.png" width="200"> <img src="figures/05-24/test_accuracy.png" width="200">
 
 ### 5/31/2018
 - Conduct comparison between hard attention model and soft attention model on Mnist dataset. 
 - Conclusion: using soft attention model performs much smoother and faster convergence than previous hard attention model (Spatial Transformer Networks). The oracle performance of soft attention model may be worse than the best hard attention model on recognition, however, in reality training converges much smoother.
 - Here I show the training convergence using the soft attention model and a baseline hard attention model (orange) on Mnist dataset. One can see the three (red, cyan, gray) soft-attention curves all converge much faster than the (orange) hard-attention (Spatial Transformer Networks) curve. For more hard attention model performances, please see the last week (5/24/2018) note.
 
-<img src="figures/05-31/legend.png" width="100">
-<img src="figures/05-31/train_accuracy.png" width="200">
-<img src="figures/05-31/test_accuracy.png" width="200">
+<img src="figures/05-31/legend.png" width="100"> <img src="figures/05-31/train_accuracy.png" width="200"> <img src="figures/05-31/test_accuracy.png" width="200">
 
 ### 6/7/2018
 
@@ -79,9 +72,7 @@ We find it is straightforward to use the attention models to conduct the experim
 2. Adding top-down direction as keyword to obtain attention significantly helps image recognition. For example, the testing recognition accuracy increases from 48% to 61% by adding top-down direction on RGB image.
 - In total, the depth and direction keyword can significantly improve recognition accuracy from 42% to 72%, increasing 30%, and the training actually has not converged yet. And all curves haven't converged yet.
 
-<img src="figures/06-07/legend.png" width="100">
-<img src="figures/06-07/train_accuracy.png" width="200">
-<img src="figures/06-07/test_accuracy.png" width="200">
+<img src="figures/06-07/legend.png" width="100"> <img src="figures/06-07/train_accuracy.png" width="200"> <img src="figures/06-07/test_accuracy.png" width="200">
 <figure>
   <figcaption>Input multiple scale images (256x256 + 128x128)</figcaption>
   <img src="figures/06-07/input_image.png" width="200">
