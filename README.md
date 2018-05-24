@@ -39,10 +39,7 @@ We find it is straightforward to use the attention models to conduct the experim
 - Summarize the performance of using the bounding box to align v.s. no aligned and using RGB + depth v.s. RGB only, on [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/) with 7000 training images and 700 testing images for 6 most frequent classes. 
 - Try to train a residual network to beat the previous VGG network, but residual network obtains worse performance on all different tasks. Need to figure out why.
 
-<img src="figures/05-03/rgb_only.png" width="200"> 
-<img src="figures/05-03/rgb_depth.png" width="200"> 
-<img src="figures/05-03/rgb_vs_depth.png" width="200"> 
-<img src="figures/05-03/unaligned_vs_aligned.png" width="200">
+| <img src="figures/05-03/rgb_only.png" width="200"> | <img src="figures/05-03/rgb_depth.png" width="200"> | <img src="figures/05-03/rgb_vs_depth.png" width="200"> | <img src="figures/05-03/unaligned_vs_aligned.png" width="200"> |
 
 ### 5/10/2018
 - To make training/testing more stable, we now use 10742 training images and 4605 testing images for 6 most frequent classes on [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/).
