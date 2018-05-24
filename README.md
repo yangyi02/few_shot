@@ -73,11 +73,4 @@ We find it is straightforward to use the attention models to conduct the experim
 - In total, the depth and direction keyword can significantly improve recognition accuracy from 42% to 72%, increasing 30%, and the training actually has not converged yet. And all curves haven't converged yet.
 
 <img src="figures/06-07/legend.png" width="100"> <img src="figures/06-07/train_accuracy.png" width="200"> <img src="figures/06-07/test_accuracy.png" width="200">
-<figure>
-  <figcaption>Input multiple scale images (256x256 + 128x128)</figcaption>
-  <img src="figures/06-07/input_image.png" width="200">
-</figure>
-<figure>
-  <figcaption>Attention maps (8x8 + 4x4)</figcaption>
-  <img src="figures/06-07/output_attn.png" width="200">
-</figure>
+<figure><figcaption>Input multiple scale images (256x256 + 128x128)</figcaption><img src="figures/06-07/input_image.png" width="200"</figure> <figure><figcaption>Attention maps (8x8 + 4x4)</figcaption><img src="figures/06-07/output_attn.png" width="200"></figure>
