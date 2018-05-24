@@ -1,4 +1,4 @@
-# Unsupervised Learning Depth and Optical Flow to Help Few Shot Supervised Learning.
+# Whether Unsupervised Learning Depth and Optical Flow can Help Few Shot Supervised Learning
 
 ## Requirement
 - PyTorch 0.3.1
@@ -6,25 +6,24 @@
 
 ## Motivation
 - This is a backup of the research for studying the effect of depth, optical flow and top-down keywords for object recognition in cluttered scenes.
-- There is an intuition that depth and optical can significantly help attention and recognition for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the correct region pointed by keywords.
-- And this work is to study how much depth and optical flow can help.
-- For the depth and optical flow data, we simply use ground truth that the dataset obtains. However, one can also use the unsupervisedly trained depth and optical flow estimation from [Other works](https://arxiv.org/abs/1711.05890).
+- There is an intuition that depth and optical can significantly help attention and recognition for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the correct region pointed by keywords. And this work is to study how much depth and optical flow can help.
+- For the depth and optical flow data, we simply use ground truth already existed in the datasets. In the next future, we will also study the unperfect unsupervisedly trained depth and optical flow estimation from [Other works](https://arxiv.org/abs/1711.05890).
 
 ## Dataset
-- We mainly use three datasets for experiments.
-1. Mnist dataset: This is simply for debug model and code.
+- We mainly use four datasets for experiments.
+1. [Mnist dataset](http://yann.lecun.com/exdb/mnist/): This is simply for debug model and code.
 2. [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/): This is the main dataset we use to study depth effect because they contain ground truth object semantic segmentation, instance segmentation, depth, etc.
-3. [VIPER dataset](http://playing-for-benchmarks.org/): This is the main dataset we use to study optical flow effect because they contain ground truth object semantic segmentation, instance segmentation, optical flow, etc.
-4. [KITTI dataset](http://www.cvlibs.net/datasets/kitti/): The final dataset we are planning to use is the well known KITTI benchmark dataset, but so far for simplisity, we haven't used it yet.
+3. [VIPER dataset](http://playing-for-benchmarks.org/): This is the other main dataset we use to study optical flow effect because they contain ground truth object semantic segmentation, instance segmentation, optical flow, etc.
+4. [KITTI dataset](http://www.cvlibs.net/datasets/kitti/): This is the final dataset we are planning to use. But so far for simplisity, we haven't used it yet.
 
 ## Benchmark & Criteria
-- Since our ultimate goal is to demonstrate that depth and optical flow can facilitate the high level semantic level tasks such as recognition and feedback attention, our problem setting is below:
-1. Given a direction keyword and a cluttered RGB image (+ depth & optical flow), how is the recognition accuracy?
-2. Given an object keyword and a cluttered RGB image (+ depth & optical flow), how is the localization (attention) accuracy?
-3. Given few supervised training labels, how does the unsupervised (depth & optical flow) help recognition / localization accuracy?
+- Our ultimate goal is to study how much depth and optical flow can help high level semantic level tasks such as object recognition and localization, particularly when there are not enough training data. Hence our problem setting is below:
+1. Given a direction keyword and a cluttered RGB image (with depth & optical flow), how is the recognition accuracy?
+2. Given an object keyword and a cluttered RGB image (with depth & optical flow), how is the localization accuracy?
+3. Given a few supervised training labels, how does the unsupervised (depth & optical flow) help recognition / localization accuracy?
 
 ## Model
-- We find it is straightforward to use the attention model to conduct the experiments. There are two variations of attention models: (1) Hard attention model such as [Spatial Transformer Networks](http://torch.ch/blog/2015/09/07/spatial_transformers.html) and [Recurrent Model of Visual Attention](http://torch.ch/blog/2015/09/21/rmva.html), (2) Soft attention model such as [Show, Attend and Tell](http://kelvinxu.github.io/projects/capgen.html). In this work, we also study the effect of these two different attention models on the recognition and localization tasks.
+- We find it is straightforward to use the attention models to conduct the experiments. There are two variations of attention models: (1) Hard attention models such as [Spatial Transformer Networks](http://torch.ch/blog/2015/09/07/spatial_transformers.html) and [Recurrent Model of Visual Attention](http://torch.ch/blog/2015/09/21/rmva.html), (2) Soft attention models such as [Show, Attend and Tell](http://kelvinxu.github.io/projects/capgen.html). In this work, we also study the effect of these two different attention models on the recognition and localization tasks.
 
 ## Preliminary Results
 - Working on soft-attention model and switch back to MLT dataset because Mnist dataset is too simple.
