@@ -5,25 +5,33 @@
 - Python 2.x
 
 ## Motivation
-- This is a backup of the research for studying the effect of depth, optical flow and top-down keywords for object recognition in cluttered scenes.
-- There is an intuition that depth and optical can significantly help attention and recognition for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the correct region pointed by keywords. And this work is to study how much depth and optical flow can help.
+Although deep neural networks have achieved promising results on visual recognition, human uses far fewer supervised training labels to reach to the same level. In thie work, we study how much depth, optical flow and top-down keywords can help object recognition and localization in cluttered scenes, particularly when there are not enough training labels.
+- There is an intuition that depth can significantly help attention and recognition for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the correct region pointed by keywords.
 - For the depth and optical flow data, we simply use ground truth already existed in the datasets. In the next future, we will also study the unperfect unsupervisedly trained depth and optical flow estimation from [Other works](https://arxiv.org/abs/1711.05890).
 
+## Problem Setting
+Our ultimate goal is to study how much depth and optical flow can help high level semantic level tasks such as object recognition and localization, particularly when there are not enough training data. Hence our problem setting is below:
+1. Given a direction keyword and a cluttered RGB image (with depth & optical flow), how is the recognition accuracy?
+2. Given an object keyword and a cluttered RGB image (with depth & optical flow), how is the localization accuracy?
+3. Given a few supervised training labels, how does the unsupervised (depth & optical flow) help recognition / localization accuracy?
+
+## Benchmark & Criteria
+We use the average recognition accuracy and localization accuracy as the quantitative measure:
+1. The recognition accuracy is very simple, it is the same as the imagenet top-1 accuracy.
+2. The localization accuracy is the average proportion of correctly predicted bounding box, where a bounding box is considered as correct if its IoU with the ground truth box is over 50%. 
+3. We will further replace the localization problem to another word prediction problem (i.e. left, right, top, down, etc.), then we will merge the two tasks into one task which is word prediction (i.e. car, pedestrian or left, right). We will then use the word prediction accuracy as the final measure.
+
 ## Dataset
-- We mainly use four datasets for experiments.
+We mainly use four datasets for experiments.
 1. [Mnist dataset](http://yann.lecun.com/exdb/mnist/): This is simply for debug model and code.
 2. [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/): This is the main dataset we use to study depth effect because they contain ground truth object semantic segmentation, instance segmentation, depth, etc.
 3. [VIPER dataset](http://playing-for-benchmarks.org/): This is the other main dataset we use to study optical flow effect because they contain ground truth object semantic segmentation, instance segmentation, optical flow, etc.
 4. [KITTI dataset](http://www.cvlibs.net/datasets/kitti/): This is the final dataset we are planning to use. But so far for simplisity, we haven't used it yet.
 
-## Benchmark & Criteria
-- Our ultimate goal is to study how much depth and optical flow can help high level semantic level tasks such as object recognition and localization, particularly when there are not enough training data. Hence our problem setting is below:
-1. Given a direction keyword and a cluttered RGB image (with depth & optical flow), how is the recognition accuracy?
-2. Given an object keyword and a cluttered RGB image (with depth & optical flow), how is the localization accuracy?
-3. Given a few supervised training labels, how does the unsupervised (depth & optical flow) help recognition / localization accuracy?
-
 ## Model
-- We find it is straightforward to use the attention models to conduct the experiments. There are two variations of attention models: (1) Hard attention models such as [Spatial Transformer Networks](http://torch.ch/blog/2015/09/07/spatial_transformers.html) and [Recurrent Model of Visual Attention](http://torch.ch/blog/2015/09/21/rmva.html), (2) Soft attention models such as [Show, Attend and Tell](http://kelvinxu.github.io/projects/capgen.html). In this work, we also study the effect of these two different attention models on the recognition and localization tasks.
+We find it is straightforward to use the attention models to conduct the experiments. There are two variations of attention models: 
+(1) Hard attention models such as [Spatial Transformer Networks](http://torch.ch/blog/2015/09/07/spatial_transformers.html) and [Recurrent Model of Visual Attention](http://torch.ch/blog/2015/09/21/rmva.html).
+(2) Soft attention models such as [Show, Attend and Tell](http://kelvinxu.github.io/projects/capgen.html). In this work, we also study the effect of these two different attention models on the recognition and localization tasks.
 
 ## Preliminary Results
 - Working on soft-attention model and switch back to MLT dataset because Mnist dataset is too simple.
