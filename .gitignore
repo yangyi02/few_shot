@@ -1,8 +1,11 @@
 .ipynb_checkpoints
 .idea
-tensorboard
+tensorboard/
 *.pth
 viper/train
 viper/val
 mlt/box
 .DS_Store
+*.pyc
+figures/
+models/

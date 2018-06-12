@@ -1,0 +1,9 @@
+/media/yi/DATA/data-orig/MLT/image/0a8b4df06c0b33c5d4c0090fd2384c03/000005_color.jpg
+/media/yi/DATA/data-orig/MLT/image/339c399763200291299c8ab5a8c515e4/000000_color.jpg
+/media/yi/DATA/data-orig/MLT/image/3537a18ab81e296f5cd0396a2dddec50/000000_color.jpg
+/media/yi/DATA/data-orig/MLT/image/373948c72515482845161ad9eaa7b347/000000_color.jpg
+/media/yi/DATA/data-orig/MLT/image/7e42db1a0bede39acb87cc8e05a90a92/000000_color.jpg
+/media/yi/DATA/data-orig/MLT/image/7e42db1a0bede39acb87cc8e05a90a92/000002_color.jpg
+/media/yi/DATA/data-orig/MLT/image/79ab659a800b5be3f9bb98bbed5bb534/000000_color.jpg
+/media/yi/DATA/data-orig/MLT/image/bec58a60b504e82b0c356feb40929289/000002_color.jpg
+/media/yi/DATA/data-orig/MLT/image/fe456af02852740ccb0e52b5ff507934/000005_color.jpg
