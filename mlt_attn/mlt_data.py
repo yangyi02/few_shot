@@ -306,43 +306,40 @@ class MLTData(object):
 
     def visualize(self, images, orig_images, depths, orig_depths, boxes, directions, labels, idx=None):
         if idx is None:
-            idx = range(len(labels))
-        else:
-            idx = [idx]
-        for n in idx:
-            print(directions[n, :], labels[n], self.inverse_class_map[labels[n]])
-            # Plot original image and depth with bounding box
-            orig_im = orig_images[n, :, :, :].transpose(1, 2, 0)
-            orig_dp = orig_depths[n, 0, :, :]
-            b = boxes[n, :].copy()
-            im_height, im_width = orig_im.shape[0], orig_im.shape[1]
-            b[0], b[2] = b[0] * im_width, b[2] * im_width
-            b[1], b[3] = b[1] * im_height, b[3] * im_height
-            fig, ax = plt.subplots(1)
-            ax.imshow(orig_im)
-            rect = patches.Rectangle((b[0], b[1]), b[2] - 1 - b[0], b[3] - 1 - b[1], linewidth=2,
-                                     edgecolor='g', facecolor='none')
-            ax.add_patch(rect)
-            fig, ax = plt.subplots(1)
-            ax.imshow(orig_dp)
-            rect = patches.Rectangle((b[0], b[1]), b[2] - 1 - b[0], b[3] - 1 - b[1], linewidth=2,
-                                     edgecolor='w', facecolor='none')
-            ax.add_patch(rect)
-            # construct a full image containing all scale images
-            max_im_size = np.max(np.array(self.im_size))
-            sum_im_size = np.sum(np.array(self.im_size))
-            im_all = np.zeros((max_im_size, sum_im_size, 3))
-            dp_all = np.zeros((max_im_size, sum_im_size))
-            cnt = 0
-            for i in range(len(images)):
-                im = images[i][n, :, :, :].transpose(1, 2, 0)
-                height, width = im.shape[0], im.shape[1]
-                im_all[0:height, cnt:cnt + width, :] = im
-                dp = depths[i][0, :, :]
-                dp_all[0:height, cnt:cnt + width] = dp
-                cnt = cnt + width
-            fig, ax = plt.subplots(1)
-            ax.imshow(im_all)
-            fig, ax = plt.subplots(1)
-            ax.imshow(dp_all)
-            plt.show()
+            idx = 0
+        print(directions[idx, :], labels[idx], self.inverse_class_map[labels[idx]])
+        # Plot original image and depth with bounding box
+        orig_im = orig_images[idx, :, :, :].transpose(1, 2, 0)
+        orig_dp = orig_depths[idx, 0, :, :]
+        b = boxes[idx, :].copy()
+        im_height, im_width = orig_im.shape[0], orig_im.shape[1]
+        b[0], b[2] = b[0] * im_width, b[2] * im_width
+        b[1], b[3] = b[1] * im_height, b[3] * im_height
+        fig, ax = plt.subplots(1)
+        ax.imshow(orig_im)
+        rect = patches.Rectangle((b[0], b[1]), b[2] - 1 - b[0], b[3] - 1 - b[1], linewidth=2,
+                                 edgecolor='g', facecolor='none')
+        ax.add_patch(rect)
+        fig, ax = plt.subplots(1)
+        ax.imshow(orig_dp)
+        rect = patches.Rectangle((b[0], b[1]), b[2] - 1 - b[0], b[3] - 1 - b[1], linewidth=2,
+                                 edgecolor='w', facecolor='none')
+        ax.add_patch(rect)
+        # construct a full image containing all scale images
+        max_im_size = np.max(np.array(self.im_size))
+        sum_im_size = np.sum(np.array(self.im_size))
+        im_all = np.zeros((max_im_size, sum_im_size, 3))
+        dp_all = np.zeros((max_im_size, sum_im_size))
+        cnt = 0
+        for i in range(len(images)):
+            im = images[i][idx, :, :, :].transpose(1, 2, 0)
+            height, width = im.shape[0], im.shape[1]
+            im_all[0:height, cnt:cnt + width, :] = im
+            dp = depths[i][idx, 0, :, :]
+            dp_all[0:height, cnt:cnt + width] = dp
+            cnt = cnt + width
+        fig, ax = plt.subplots(1)
+        ax.imshow(im_all)
+        fig, ax = plt.subplots(1)
+        ax.imshow(dp_all)
+        plt.show()
