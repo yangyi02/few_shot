@@ -75,13 +75,13 @@ class MLTData(object):
                      'depth': self.meta['depth'][int(num_image * thresh):],
                      'box': self.meta['box'][int(num_image * thresh):]}
         num_train_image = len(train_meta['img'])
-        train_meta['img'] = train_meta['img'][0:int(num_image * self.train_proportion)]
-        train_meta['depth'] = train_meta['depth'][0:int(num_image * self.train_proportion)]
-        train_meta['box'] = train_meta['box'][0:int(num_image * self.train_proportion)]
+        train_meta['img'] = train_meta['img'][0:int(num_train_image * self.train_proportion)]
+        train_meta['depth'] = train_meta['depth'][0:int(num_train_image * self.train_proportion)]
+        train_meta['box'] = train_meta['box'][0:int(num_train_image * self.train_proportion)]
         num_test_image = len(test_meta['img'])
-        test_meta['img'] = test_meta['img'][0:int(num_image * self.test_proportion)]
-        test_meta['depth'] = test_meta['depth'][0:int(num_image * self.test_proportion)]
-        test_meta['box'] = test_meta['box'][0:int(num_image * self.test_proportion)]
+        test_meta['img'] = test_meta['img'][0:int(num_test_image * self.test_proportion)]
+        test_meta['depth'] = test_meta['depth'][0:int(num_test_image * self.test_proportion)]
+        test_meta['box'] = test_meta['box'][0:int(num_test_image * self.test_proportion)]
         return train_meta, test_meta
 
     def rearrange_annotation(self, meta):
