@@ -1,8 +1,8 @@
-mkdir -p cache/logs
-mkdir -p cache/figures
-mkdir -p cache/models
-mkdir -p cache/tensorboard
-mkdir -p cache/tests/logs
-mkdir -p cache/tests/figures
-mkdir -p cache/tests/models
-mkdir -p cache/tests/tensorboard
+KITTI_DATA_PATH=/media/yi/DATA/data-orig/kitti
+CODE_PATH=/home/yi/code/few_shot/kitti_det
+CACHE_PATH=$CODE_PATH/cache
+
+mkdir -p $CACHE_PATH/logs
+mkdir -p $CACHE_PATH/figures
+mkdir -p $CACHE_PATH/models
+mkdir -p $CACHE_PATH/tensorboard
