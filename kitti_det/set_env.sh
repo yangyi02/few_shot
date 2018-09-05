@@ -1,7 +1,9 @@
-KITTI_DATA_PATH=/media/yi/DATA/data-orig/kitti
-CODE_PATH=/home/yi/code/few_shot/kitti_det
-CACHE_PATH=$CODE_PATH/cache
+# TTI_DATA_PATH=/media/yi/DATA/data-orig/kitti
+# CODE_PATH=/home/yi/code/few_shot/kitti_det
+KITTI_DATA_PATH=/mnt/project/yangyi05/kitti
+CODE_PATH=/mnt/scratch/yangyi05/few_shot/kitti_det
 
+CACHE_PATH=$CODE_PATH/cache
 mkdir -p $CACHE_PATH/logs
 mkdir -p $CACHE_PATH/figures
 mkdir -p $CACHE_PATH/models

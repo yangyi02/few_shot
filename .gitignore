@@ -9,3 +9,4 @@ mlt/box
 *.pyc
 figures/
 models/
+cache/

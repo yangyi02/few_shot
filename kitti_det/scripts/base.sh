@@ -1,6 +1,6 @@
 #!/bin/bash
 CUR_DIR=$(dirname "$0")
-source CUR_DIR/../set_env.sh
+source $CUR_DIR/../set_env.sh
 
 MODEL=base
 
@@ -8,15 +8,15 @@ MODEL=base
 # test mode test the shell script
 # fast mode train the model with fewer data and fewer iterations
 # full mode train the model with full data and full iterations
-MODE = $1
-if [MODE = 'test']; then
+MODE=$1
+if [ $MODE = 'test' ]; then
   EXP_NAME=${MODEL}_test
   TRAIN_PROPORTION=0.1
   TRAIN_ITERATION=2
   TEST_ITERATION=1
   TEST_INTERVAL=2
   TEST_PROPORTION=0.05
-elif [MODE = 'fast']; then
+elif [ $MODE = 'fast' ]; then
   EXP_NAME=${MODEL}_fs
   TRAIN_PROPORTION=0.1
   TRAIN_ITERATION=300
@@ -46,7 +46,7 @@ NUM_SCALE=1
 NUM_CLASS=1
 
 # Train
-CUDA_VISIBLE_DEVICES=1 python main.py --train \
+CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
   --exp_name=$EXP_NAME --model=$MODEL --batch_size=$BATCH_SIZE \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
@@ -57,7 +57,7 @@ CUDA_VISIBLE_DEVICES=1 python main.py --train \
   |& tee $LOG_PATH
 
 # Test
-CUDA_VISIBLE_DEVICES=1 python main.py --test \
+CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --test \
   --exp_name=$EXP_NAME --model=$MODEL --batch_size=$BATCH_SIZE \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
@@ -71,7 +71,7 @@ IMAGE_NAME=$KITTI_DATA_PATH/training/image_2/000003.png
 DEPTH_NAME=$KITTI_DATA_PATH/training/disp_unsup/000003.png
 FLOW_NAME=$KITTI_DATA_PATH/training/flow_unsup/000003.png
 BOX_NAME=$KITTI_DATA_PATH/training/label_2/000003.txt
-CUDA_VISIBLE_DEVICES=1 python main.py --visualize \
+CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --visualize \
   --exp_name=$EXP_NAME --model=$MODEL \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
@@ -82,7 +82,7 @@ CUDA_VISIBLE_DEVICES=1 python main.py --visualize \
   --figure_path=$FIG_PATH
 
 # Predict a set of images and visualize
-CUDA_VISIBLE_DEVICES=1 python main.py --visualize_all \
+CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --visualize_all \
   --exp_name=$EXP_NAME --model=$MODEL \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
