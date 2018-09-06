@@ -5,11 +5,11 @@ source $CUR_DIR/../set_env.sh
 MODEL=base_2stream
 
 # Mode can be test mode, fast training mode or slow training mode
-# test mode test the shell script, make sure training and testing works
+# unit_test mode test the shell script, make sure training and testing works
 # fast mode train the model with fewer data and fewer iterations
 # full mode train the model with full data and full iterations
 MODE=$1
-if [ "$MODE" = "test" ]; then
+if [ "$MODE" = "unit_test" ]; then
   EXP_NAME=${MODEL}_test
   TRAIN_PROPORTION=0.1
   TRAIN_ITERATION=2
