@@ -48,6 +48,7 @@ def parse_args():
     arg_parser.add_argument('--num_class', type=int, default=1)
     arg_parser.add_argument('--train_proportion', type=float, default=1.0)
     arg_parser.add_argument('--test_proportion', type=float, default=1.0)
+
     arg_parser.add_argument('--show_statistics', default='')
 
     arg_parser.add_argument('--init_model_path', default='')
