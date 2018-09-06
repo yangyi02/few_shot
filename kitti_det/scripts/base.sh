@@ -5,7 +5,7 @@ source $CUR_DIR/../set_env.sh
 MODEL=base
 
 # Mode can be test mode, fast training mode or slow training mode
-# test mode test the shell script
+# test mode test the shell script, make sure training and testing works
 # fast mode train the model with fewer data and fewer iterations
 # full mode train the model with full data and full iterations
 MODE=$1
