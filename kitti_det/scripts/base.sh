@@ -47,7 +47,8 @@ NUM_CLASS=1
 
 # Train
 CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
-  --exp_name=$EXP_NAME --model=$MODEL --batch_size=$BATCH_SIZE \
+  --exp_name=$EXP_NAME --model=$MODEL --data_path=$DATA_PATH \
+  --batch_size=$BATCH_SIZE \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
@@ -58,7 +59,8 @@ CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
 
 # Test
 CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --test \
-  --exp_name=$EXP_NAME --model=$MODEL --batch_size=$BATCH_SIZE \
+  --exp_name=$EXP_NAME --model=$MODEL --data_path=$DATA_PATH \
+  --batch_size=$BATCH_SIZE \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
@@ -67,12 +69,12 @@ CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --test \
   |& tee -a $LOG_PATH
 
 # Predict one image and visualize
-IMAGE_NAME=$KITTI_DATA_PATH/training/image_2/000003.png
-DEPTH_NAME=$KITTI_DATA_PATH/training/disp_unsup/000003.png
-FLOW_NAME=$KITTI_DATA_PATH/training/flow_unsup/000003.png
-BOX_NAME=$KITTI_DATA_PATH/training/label_2/000003.txt
+IMAGE_NAME=$DATA_PATH/image_2/000003.png
+DEPTH_NAME=$DATA_PATH/disp_unsup/000003.png
+FLOW_NAME=$DATA_PATH/flow_unsup/000003.png
+BOX_NAME=$DATA_PATH/label_2/000003.txt
 CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --visualize \
-  --exp_name=$EXP_NAME --model=$MODEL \
+  --exp_name=$EXP_NAME --model=$MODEL --data_path=$DATA_PATH \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
@@ -83,10 +85,10 @@ CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --visualize \
 
 # Predict a set of images and visualize
 CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --visualize_all \
-  --exp_name=$EXP_NAME --model=$MODEL \
+  --exp_name=$EXP_NAME --model=$MODEL --data_path=$DATA_PATH \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
   --init_model_path=$MODEL_PATH \
-  --image_list=images.txt \
+  --image_list=$CODE_PATH/images.txt \
   --figure_path=$FIG_PATH

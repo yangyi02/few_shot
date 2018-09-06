@@ -203,7 +203,7 @@ class DetectInterface(object):
             image_name = dirs[-1]
             file_name, file_ext = os.path.splitext(image_name)
             file_id = file_name.split('_')[0]
-            image_name = os.path.join(self.data.img_dir, file_id + '.png')
+            image_name = os.path.join(self.data.image_dir, file_id + '.png')
             depth_name = os.path.join(self.data.depth_dir, file_id + '.png')
             flow_name = os.path.join(self.data.flow_dir, file_id + '.png')
             box_name = os.path.join(self.data.box_dir, file_id + '.txt')

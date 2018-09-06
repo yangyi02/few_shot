@@ -18,11 +18,11 @@ def main():
     logging.info(args)
 
     if args.data == 'kitti':
-        data = KittiData(args.batch_size, args.image_heights, args.image_widths, args.output_heights,
-                         args.output_widths, args.num_scale, args.train_proportion,
-                         args.test_proportion, args.show_statistics)
-    elif args.data == 'viper':
-        print('Not Implemented Yet')
+        data = KittiData(args.data_path, args.batch_size, args.image_heights, args.image_widths,
+                         args.output_heights, args.output_widths, args.num_scale,
+                         args.train_proportion, args.test_proportion, args.show_statistics)
+    else:
+        print('Data not implemented yet')
         return
 
     if args.model == 'base':
@@ -31,6 +31,9 @@ def main():
         model = Base3DNet(args.image_channel, args.depth_channel, args.num_class)
     elif args.model == 'base_2stream':
         model = Base2StreamNet(args.image_channel, args.depth_channel, args.num_class)
+    else:
+        print('Model not implemented yet')
+        return
 
     interface = DetectInterface(data, model, args.learning_rate, args.train_iteration,
                                 args.test_iteration, args.test_interval, args.save_interval,
@@ -49,6 +52,9 @@ def main():
     elif args.visualize_all:
         logging.info('Experiment: %s, visualizing all', args.exp_name)
         interface.visualize_all(args.image_list, args.figure_path)
+    else:
+        print('Unknown command')
+        return
 
 
 if __name__ == '__main__':
