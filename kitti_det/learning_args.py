@@ -32,8 +32,8 @@ def parse_args():
 
     arg_parser.add_argument('--learning_rate', type=float, default=0.001)
     arg_parser.add_argument('--train_iteration', type=int, default=3000)
-    arg_parser.add_argument('--test_iteration', type=int, default=10)
     arg_parser.add_argument('--test_interval', type=int, default=100)
+    arg_parser.add_argument('--test_iteration', type=int, default=10)
     arg_parser.add_argument('--save_interval', type=int, default=3000)
 
     arg_parser.add_argument('--batch_size', type=int, default=8)

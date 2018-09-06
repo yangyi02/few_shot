@@ -13,22 +13,22 @@ if [ $MODE = 'test' ]; then
   EXP_NAME=${MODEL}_test
   TRAIN_PROPORTION=0.1
   TRAIN_ITERATION=2
-  TEST_ITERATION=1
   TEST_INTERVAL=2
+  TEST_ITERATION=1
   TEST_PROPORTION=0.05
 elif [ $MODE = 'fast' ]; then
   EXP_NAME=${MODEL}_fs
   TRAIN_PROPORTION=0.1
   TRAIN_ITERATION=300
-  TEST_ITERATION=10
   TEST_INTERVAL=100
+  TEST_ITERATION=10
   TEST_PROPORTION=1
 else
   EXP_NAME=${MODEL}
   TRAIN_PROPORTION=1
   TRAIN_ITERATION=3000
-  TEST_ITERATION=10
   TEST_INTERVAL=100
+  TEST_ITERATION=10
   TEST_PROPORTION=1
 fi
 # Set output paths
@@ -53,7 +53,7 @@ CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
   --train_proportion=$TRAIN_PROPORTION --train_iteration=$TRAIN_ITERATION \
-  --test_iteration=$TEST_ITERATION --test_interval=$TEST_INTERVAL \
+  --test_interval=$TEST_INTERVAL --test_iteration=$TEST_ITERATION \
   --save_model_path=$MODEL_PATH --tensorboard_path=$TENSORBOARD_PATH \
   |& tee $LOG_PATH
 
