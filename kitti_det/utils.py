@@ -1,6 +1,7 @@
 import os
 import numpy as np
 
+
 def nms(score_maps, offsets, im_height, im_width, overlap_thresh=0.5):
     boxes = score2box(score_maps, offsets, im_height, im_width)
     boxes = non_max_suppression_fast(boxes, overlap_thresh)
