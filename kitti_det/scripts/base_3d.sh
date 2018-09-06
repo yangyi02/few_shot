@@ -9,14 +9,14 @@ MODEL=base_3d
 # fast mode train the model with fewer data and fewer iterations
 # full mode train the model with full data and full iterations
 MODE=$1
-if [ $MODE = 'test' ]; then
+if [ "$MODE" = "test" ]; then
   EXP_NAME=${MODEL}_test
   TRAIN_PROPORTION=0.1
   TRAIN_ITERATION=2
   TEST_INTERVAL=2
   TEST_ITERATION=1
   TEST_PROPORTION=0.05
-elif [ $MODE = 'fast' ]; then
+elif [ "$MODE" = "fast" ]; then
   EXP_NAME=${MODEL}_fs
   TRAIN_PROPORTION=0.1
   TRAIN_ITERATION=300
