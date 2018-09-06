@@ -54,6 +54,7 @@ def parse_args():
     arg_parser.add_argument('--save_model_path', default='')
     arg_parser.add_argument('--tensorboard_path', default='tensorboard/')
 
+    arg_parser.add_argument('--data_path', default='')
     arg_parser.add_argument('--image_name', default='')
     arg_parser.add_argument('--box_name', default='')
     arg_parser.add_argument('--depth_name', default='')

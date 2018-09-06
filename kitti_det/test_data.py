@@ -21,10 +21,6 @@ class DataTest(object):
         im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, _, _ = self.data.get_next_batch('test')
         self.data.visualize(im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of)
 
-        image_name = '/media/yi/DATA/data-orig/kitti/training/image_2/000007.png'
-        depth_name = '/media/yi/DATA/data-orig/kitti/training/disp_unsup/000007.png'
-        flow_name = '/media/yi/DATA/data-orig/kitti/training/flow_unsup/000007.png'
-        box_name = '/media/yi/DATA/data-orig/kitti/training/label_2/000007.txt'
         im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of = \
                 self.data.get_one_sample(image_name, depth_name, flow_name, box_name)
         self.data.visualize(im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of)
@@ -33,11 +29,12 @@ class DataTest(object):
 def main():
     args = parse_args()
     logging.info(args)
+
     if args.data == 'kitti':
-        data = KittiData(args.batch_size, args.image_heights, args.image_widths,
+        data = KittiData(args.data_path, args.batch_size, args.image_heights, args.image_widths,
                          args.output_heights, args.output_widths, args.num_scale,
                          args.train_proportion, args.test_proportion, args.show_statistics)
-    elif args.data == 'viper':
+    else:
         print('Not Implemented Yet')
         return
 

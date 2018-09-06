@@ -13,14 +13,15 @@ logging.basicConfig(format='[%(levelname)s %(asctime)s %(filename)s:%(lineno)s] 
 
 
 class KittiData(object):
-    def __init__(self, batch_size=8, image_heights=[128], image_widths=[384], output_heights=[16],
-                 output_widths=[48], num_scale=1, train_proportion=1, test_proportion=1,
+    def __init__(self, data_path, batch_size=8, image_heights=[128], image_widths=[384],
+                 output_heights=[16], output_widths=[48], num_scale=1,
+                 train_proportion=1, test_proportion=1,
                  show_statistics=''):
         self.name = 'kitti'
-        self.img_dir = '/media/yi/DATA/data-orig/kitti/training/image_2'
-        self.depth_dir = '/media/yi/DATA/data-orig/kitti/training/disp_unsup'
-        self.flow_dir = '/media/yi/DATA/data-orig/kitti/training/flow_unsup'
-        self.box_dir = '/media/yi/DATA/data-orig/kitti/training/label_2'
+        self.image_dir = os.path.join(data_path, 'image_2')
+        self.depth_dir = os.path.join(data_path, 'disp_unsup')
+        self.flow_dir = os.path.join(data_path, 'flow_unsup')
+        self.box_dir = os.path.join(data_path, 'label_2')
 
         self.batch_size = batch_size
         self.im_heights = image_heights
@@ -69,7 +70,7 @@ class KittiData(object):
             img_files.append(file_name + '.png')
             depth_files.append(file_name + '.png')
             flow_files.append(file_name + '.png')
-        img_file_names = [os.path.join(self.img_dir, f) for f in img_files]
+        img_file_names = [os.path.join(self.image_dir, f) for f in img_files]
         depth_file_names = [os.path.join(self.depth_dir, f) for f in depth_files]
         flow_file_names = [os.path.join(self.flow_dir, f) for f in flow_files]
         meta['img'].extend(img_file_names)
