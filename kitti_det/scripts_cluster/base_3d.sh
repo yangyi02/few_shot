@@ -35,7 +35,7 @@ fi
 MODEL_PATH=$CACHE_PATH/models/$EXP_NAME.pth
 TENSORBOARD_PATH=$CACHE_PATH/tensorboard/$EXP_NAME
 LOG_PATH=$CACHE_PATH/logs/$EXP_NAME.log
-ERROR_PATH=$CACHE_PATH/logs/{$EXP_NAME}_error.log
+ERROR_PATH=$CACHE_PATH/logs/${EXP_NAME}_error.log
 FIG_PATH=$CACHE_PATH/figures/$EXP_NAME
 
 # Set model parameters
