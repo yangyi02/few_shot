@@ -10,17 +10,19 @@ class DataTest(object):
     def __init__(self, data):
         self.data = data
 
-    def test(self):
-        # self.data.show_basic_statistics('train')
-        # self.data.show_basic_statistics('test')
-        # self.data.show_full_statistics('train')
-        # self.data.show_full_statistics('test')
+    def test_statistics(self):
+        self.data.show_basic_statistics('train')
+        self.data.show_basic_statistics('test')
+        self.data.show_full_statistics('train')
+        self.data.show_full_statistics('test')
 
+    def test(self):
         im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, _, _ = self.data.get_next_batch('train')
         self.data.visualize(im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of)
         im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, _, _ = self.data.get_next_batch('test')
         self.data.visualize(im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of)
 
+    def test_one_image(self, image_name, depth_name, flow_name, box_name):
         im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of = \
                 self.data.get_one_sample(image_name, depth_name, flow_name, box_name)
         self.data.visualize(im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of)
@@ -40,6 +42,8 @@ def main():
 
     data_test = DataTest(data)
     data_test.test()
+    data_test.test_one_image(args.image_name, args.depth_name, args.flow_name, args.box_name)
+    # data_test.test_statistics()
 
 
 if __name__ == '__main__':
