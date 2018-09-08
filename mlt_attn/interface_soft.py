@@ -152,9 +152,9 @@ class SoftAttnInterface(object):
             loss = criterion(pred, label)
             _, pred_label = torch.max(pred, 1)
             acc = (pred_label == label).sum().float() / label.size(0)
+
             test_loss_all.append(loss)
             test_acc_all.append(acc)
-
             logging.info('at instance %d, test loss: %.2f, test accuracy: %.2f', cnt, loss, acc)
 
         test_loss = np.mean(np.array(test_loss_all))
