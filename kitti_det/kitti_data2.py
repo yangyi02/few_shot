@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from PIL import Image
 import cv2
-from scipy.stats.kde import gaussian_kde
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
@@ -224,7 +223,6 @@ class KittiDataset(Dataset):
         depth = flowlib.read_disp_png(self.meta['depth'][idx])
         flow = flowlib.read_flow_png(self.meta['flow'][idx])
         box = np.array(self.meta['box'][idx])
-        heatmap = self.meta['heatmap'][idx]
 
         if self.data_augment:
             image, depth, flow, box = self.data_augmentation(image, depth, flow, box)
@@ -332,7 +330,8 @@ class KittiDataset(Dataset):
             sample = self.transform(sample)
         return sample
 
-    def data_augmentation(self, image, depth, flow, box):
+    @staticmethod
+    def data_augmentation(image, depth, flow, box):
         im_width = image.shape[1]
         # Flip image
         if np.random.randint(2) == 1:
@@ -399,29 +398,32 @@ class KittiDataset(Dataset):
     def visualize(self, sample):
         # Visualize input images in all scales
         images = sample['images']
-        image_all = concat_images(images)
-        visualize_image(image_all)
+        image_all = self.concat_images(images)
+        self.visualize_image(image_all)
         # Visualize input depths in all scales
         depths = [flowlib.visualize_disp(dp[:, :, 0]) for dp in sample['depths']]
-        depth_all = concat_images(depths)
-        visualize_image(depth_all)
+        depth_all = self.concat_images(depths)
+        self.visualize_image(depth_all)
         # Visualize input flows in all scales
         flows = [flowlib.visualize_flow(fl) for fl in sample['flows']]
-        flow_all = concat_images(flows)
-        visualize_image(flow_all)
+        flow_all = self.concat_images(flows)
+        self.visualize_image(flow_all.astype(np.uint8))
         # Visualize output heatmaps in all scales
-        heatmap_all = concat_images(sample['heatmaps'])
-        visualize_image(hm_all)
-        heatmap_on_image = self.concat_heatmap_on_image(im_all, lb_all)
-        visualize_image(heatmap_on_image)
+        heatmap_all = self.concat_images(sample['heatmaps'])
+        self.visualize_image(heatmap_all)
+        heatmap_on_image = self.concat_heatmap_on_image(image_all, heatmap_all)
+        self.visualize_image(heatmap_on_image)
         # Visualize reconstructed bounding boxes in original image scale
         boxes = self.heatmap2box(sample['heatmaps'], sample['offsets'])
-        visualize_box_on_image(sample['orig_image'], boxes, 'g')
-        visualize_box_on_image(sample['orig_depth'], boxes, 'w')
-        visualize_box_on_image(sample['orig_flow'], boxes, 'k')
+        orig_image = sample['orig_image']
+        self.visualize_box_on_image(orig_image, boxes, 'g')
+        orig_depth = flowlib.visualize_disp(sample['orig_depth'][:, :, 0])
+        self.visualize_box_on_image(orig_depth, boxes, 'w')
+        orig_flow = flowlib.visualize_flow(sample['orig_flow'])
+        self.visualize_box_on_image(orig_flow.astype(np.uint8), boxes, 'k')
 
     @staticmethod
-    def concate_images(images):
+    def concat_images(images):
         # construct a full image containing all scale images
         max_im_width = 0
         for i in range(len(images)):
@@ -438,18 +440,18 @@ class KittiDataset(Dataset):
             height, width = im.shape[0], im.shape[1]
             image_all[cnt:cnt + height, 0:width, :] = im
             cnt = cnt + height
-        return image_all.astype(np.uint8)
+        return image_all
 
     @staticmethod
     def visualize_image(image):
         fig, ax = plt.subplots(1)
-        ax.imshow(on_image)
+        ax.imshow(image)
         plt.show()
 
     @staticmethod
     def visualize_box_on_image(image, boxes, color):
         fig, ax = plt.subplots(1)
-        ax.imshow(orig_image)
+        ax.imshow(image)
         b = boxes
         if len(b) > 0:
             if np.max(b) < 1.01 and np.min(b) > -0.01:
@@ -467,14 +469,17 @@ class KittiDataset(Dataset):
     def concat_heatmap_on_image(image, heatmap):
         im_height, im_width = image.shape[0], image.shape[1]
         heatmap = cv2.resize(heatmap, (im_width, im_height), interpolation=cv2.INTER_LINEAR)
-        heatmap = np.dstack((heatmap, heatmap, heatmap))
-        heatmap_on_image = image * 0.2 + pred * 0.8
+        if len(heatmap.shape) == 2:
+            heatmap = np.dstack((heatmap, heatmap, heatmap))
+        if len(heatmap.shape) == 3 and heatmap.shape[2] == 1:
+            heatmap = np.dstack((heatmap, heatmap, heatmap))
+        heatmap_on_image = image * 0.2 + heatmap * 0.8
         return heatmap_on_image
 
     def heatmap2box(self, heatmaps, offsets):
         boxes = []
         for i in range(len(heatmaps)):
-            heatmap = heatmaps[i]
+            heatmap = heatmaps[i][:, :, 0]
             offset = offsets[i]
             ou_height, ou_width = heatmap.shape[0], heatmap.shape[1]
             [y_c, x_c] = np.nonzero(heatmap)
@@ -510,36 +515,42 @@ class ToTensor(object):
                   'heatmaps': heatmaps, 'offsets': offsets}
         return sample
 
-# data_path = '/mnt/project/yangyi05/kitti/training'
-data_path = '/media/yi/DATA/data-orig/kitti/training'
-kitti_data = KittiData(data_path)
-train_dataset = KittiDataset(kitti_data.train_meta, [128], [384], 1, [16], [48],
-                             data_augment=True)
-for i in range(2):
-    sample = train_dataset[i]
-    print(sample['images'][0].shape, sample['depths'][0].shape, sample['flows'][0].shape,
-          sample['heatmaps'][0].shape, sample['offsets'][0].shape)
 
-test_dataset = KittiDataset(kitti_data.test_meta, [128], [384], 1, [16], [48])
-for i in range(2):
-    sample = test_dataset[i]
-    print(sample['images'][0].shape, sample['depths'][0].shape, sample['flows'][0].shape,
-          sample['heatmaps'][0].shape, sample['offsets'][0].shape)
+def main():
+    # data_path = '/mnt/project/yangyi05/kitti/training'
+    data_path = '/media/yi/DATA/data-orig/kitti/training'
+    kitti_data = KittiData(data_path)
+    train_dataset = KittiDataset(kitti_data.train_meta, [128], [384], 1, [16], [48],
+                                 data_augment=True)
+    for i in range(2):
+        sample = train_dataset[i]
+        print(sample['images'][0].shape, sample['depths'][0].shape, sample['flows'][0].shape,
+              sample['heatmaps'][0].shape, sample['offsets'][0].shape)
 
-train_dataset = KittiDataset(kitti_data.train_meta, [128], [384], 1, [16], [48],
-                             data_augment=True, transform=transforms.Compose([ToTensor()]))
-train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4)
-for i, sample in enumerate(train_dataloader):
-    if i > 1:
-        break
-    print(i, sample['images'][0].size(), sample['depths'][0].size(), sample['flows'][0].size(),
-          sample['heatmaps'][0].size(), sample['offsets'][0].size())
+    test_dataset = KittiDataset(kitti_data.test_meta, [128], [384], 1, [16], [48])
+    for i in range(2):
+        sample = test_dataset[i]
+        print(sample['images'][0].shape, sample['depths'][0].shape, sample['flows'][0].shape,
+              sample['heatmaps'][0].shape, sample['offsets'][0].shape)
 
-test_dataset = KittiDataset(kitti_data.test_meta, [128], [384], 1, [16], [48],
-                            data_augment=True, transform=transforms.Compose([ToTensor()]))
-test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_workers=4)
-for i, sample in enumerate(test_dataloader):
-    if i > 1:
-        break
-    print(i, sample['images'][0].size(), sample['depths'][0].size(), sample['flows'][0].size(),
-          sample['heatmaps'][0].size(), sample['offsets'][0].size())
+    train_dataset = KittiDataset(kitti_data.train_meta, [128], [384], 1, [16], [48],
+                                 data_augment=True, transform=transforms.Compose([ToTensor()]))
+    train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=False, num_workers=1)
+    for i, sample in enumerate(train_dataloader):
+        if i > 1:
+            break
+        print(i, sample['images'][0].size(), sample['depths'][0].size(), sample['flows'][0].size(),
+              sample['heatmaps'][0].size(), sample['offsets'][0].size())
+
+    test_dataset = KittiDataset(kitti_data.test_meta, [128], [384], 1, [16], [48],
+                                data_augment=True, transform=transforms.Compose([ToTensor()]))
+    test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_workers=4)
+    for i, sample in enumerate(test_dataloader):
+        if i > 1:
+            break
+        print(i, sample['images'][0].size(), sample['depths'][0].size(), sample['flows'][0].size(),
+              sample['heatmaps'][0].size(), sample['offsets'][0].size())
+
+
+if __name__ == '__main__':
+    main()

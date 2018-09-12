@@ -13,7 +13,7 @@ class DataTest(object):
         self.im_widths = args.image_widths
         self.num_scale = args.num_scale
         self.ou_heights = args.output_heights
-        self.ou_widths = args.ou_widths
+        self.ou_widths = args.output_widths
 
     def test_statistics(self):
         self.data.show_basic_statistics('train')
@@ -23,46 +23,44 @@ class DataTest(object):
 
     def test(self):
         im_h, im_w, n_s = self.im_heights, self.im_widths, self.num_scale
-        ou_h, ou_w = self.output_heights, self.output_widths
-        train_dataset = KittiDataset(data.train_meta, im_h, im_w, n_s, ou_h, ou_w,
+        ou_h, ou_w = self.ou_heights, self.ou_widths
+        train_dataset = KittiDataset(self.data.train_meta, im_h, im_w, n_s, ou_h, ou_w,
                                      data_augment=True)
-        import pdb
-        pdb.set_trace()
         for i in range(2):
             sample = train_dataset[i]
             for n in range(n_s):
                 print(sample['images'][n].shape, sample['depths'][n].shape, sample['flows'][n].shape,
                       sample['heatmaps'][n].shape, sample['offsets'][n].shape)
-        print('I am here')
-        test_dataset = KittiDataset(data.test_meta, im_h, im_w, n_s, ou_h, ou_w)
+
+        test_dataset = KittiDataset(self.data.test_meta, im_h, im_w, n_s, ou_h, ou_w)
         for i in range(2):
             sample = test_dataset[i]
             for n in range(n_s):
                 print(sample['images'][n].shape, sample['depths'][n].shape, sample['flows'][n].shape,
                       sample['heatmaps'][n].shape, sample['offsets'][n].shape)
-        print('I am here')
 
-        train_sample = train_dataset[0]
-        # self.data.visualize(train_sample)
-        test_sample = test_dataset[0]
-        # self.data.visualize(test_sample)
+        train_sample = train_dataset[3]
+        train_dataset.visualize(train_sample)
+        test_sample = test_dataset[3]
+        test_dataset.visualize(test_sample)
 
     def test_one_image(self, image_name, depth_name, flow_name, box_name):
-        print('I am here')
+        im_h, im_w, n_s = self.im_heights, self.im_widths, self.num_scale
+        ou_h, ou_w = self.ou_heights, self.ou_widths
         meta = {'image': [image_name], 'depth': [depth_name], 'flow': [flow_name], 'box': [box_name]}
         meta = self.data.rearrange_annotation(meta)
-        print('I am here')
         dataset = KittiDataset(meta, im_h, im_w, n_s, ou_h, ou_w)
         sample = dataset[0]
         print(sample['images'][0].shape, sample['depths'][0].shape, sample['flows'][0].shape,
               sample['heatmaps'][0].shape, sample['offsets'][0].shape)
-        # self.data.visualize(sample)
+        self.data.visualize(sample)
 
 
 def main():
     args = parse_args()
     logging.info(args)
-    args.data_path = '/mnt/project/yangyi05/kitti/training'
+    # args.data_path = '/mnt/project/yangyi05/kitti/training'
+    args.data_path = '/media/yi/DATA/data-orig/kitti/training'
 
     if args.data == 'kitti':
         data = KittiData(args.data_path, args.train_proportion, args.test_proportion, args.show_statistics)
@@ -72,7 +70,6 @@ def main():
 
     data_test = DataTest(data, args)
     data_test.test()
-    print('I am here')
     data_test.test_one_image(args.image_name, args.depth_name, args.flow_name, args.box_name)
     # data_test.test_statistics()
 
