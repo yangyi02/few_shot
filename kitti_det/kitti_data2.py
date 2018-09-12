@@ -397,96 +397,74 @@ class KittiDataset(Dataset):
         return image, depth, flow, box
 
     def visualize(self, sample):
-        orig_image = sample['orig_image']
-        orig_depth = sample['orig_depth']
-        orig_flow = sample['orig_flow']
+        # Visualize input images in all scales
         images = sample['images']
-        depths = sample['depths']
-        flows = sample['flows']
-        heatmaps = sample['heatmaps']
-        offsets = sample['offsets']
+        image_all = concat_images(images)
+        visualize_image(image_all)
+        # Visualize input depths in all scales
+        depths = [flowlib.visualize_disp(dp[:, :, 0]) for dp in sample['depths']]
+        depth_all = concat_images(depths)
+        visualize_image(depth_all)
+        # Visualize input flows in all scales
+        flows = [flowlib.visualize_flow(fl) for fl in sample['flows']]
+        flow_all = concat_images(flows)
+        visualize_image(flow_all)
+        # Visualize output heatmaps in all scales
+        heatmap_all = concat_images(sample['heatmaps'])
+        visualize_image(hm_all)
+        heatmap_on_image = self.concat_heatmap_on_image(im_all, lb_all)
+        visualize_image(heatmap_on_image)
+        # Visualize reconstructed bounding boxes in original image scale
+        boxes = self.heatmap2box(sample['heatmaps'], sample['offsets'])
+        visualize_box_on_image(sample['orig_image'], boxes, 'g')
+        visualize_box_on_image(sample['orig_depth'], boxes, 'w')
+        visualize_box_on_image(sample['orig_flow'], boxes, 'k')
+
+    @staticmethod
+    def concate_images(images):
         # construct a full image containing all scale images
-        max_im_size = np.max(np.array(self.im_widths))
-        sum_im_size = np.sum(np.array(self.im_heights))
-        im_all = np.zeros((sum_im_size, max_im_size, 3))
-        dp_all = np.zeros((sum_im_size, max_im_size, 3))
-        fl_all = np.zeros((sum_im_size, max_im_size, 3))
+        max_im_width = 0
+        for i in range(len(images)):
+            im_width = images[i].shape[1]
+            max_im_width = max(max_im_width, im_width)
+        sum_im_height = 0
+        for i in range(len(images)):
+            im_height = images[i].shape[0]
+            sum_im_height = sum_im_height + im_height
+        image_all = np.zeros((sum_im_height, max_im_width, 3))
         cnt = 0
         for i in range(len(images)):
             im = images[i]
             height, width = im.shape[0], im.shape[1]
-            im_all[cnt:cnt + height, 0:width, :] = im
-            dp = depths[i][:, :, 0]
-            dp = flowlib.visualize_disp(dp)
-            dp_all[cnt:cnt + height, 0:width, :] = dp
-            fl = flows[i]
-            fl = flowlib.visualize_flow(fl)
-            fl_all[cnt:cnt + height, 0:width, :] = fl
+            image_all[cnt:cnt + height, 0:width, :] = im
             cnt = cnt + height
-        fig, ax = plt.subplots(1)
-        ax.imshow(im_all)
-        plt.show()
-        fig, ax = plt.subplots(1)
-        ax.imshow(dp_all)
-        plt.show()
-        fig, ax = plt.subplots(1)
-        ax.imshow(fl_all.astype(np.uint8))
-        plt.show()
-
-        max_ou_size = np.max(np.array(self.output_widths))
-        sum_ou_size = np.sum(np.array(self.output_heights))
-        hm_all = np.zeros((sum_ou_size, max_ou_size))
-        cnt = 0
-        for i in range(len(heatmaps)):
-            hm = heatmap_maps[i]
-            height, width = hm.shape[0], hm.shape[1]
-            hm_all[cnt:cnt + height, 0:width] = hm
-            cnt = cnt + height
-        fig, ax = plt.subplots(1)
-        ax.imshow(hm_all)
-        plt.show()
-
-        heatmap_on_image = self.visualize_heatmap_on_image(im_all, lb_all)
-        fig, ax = plt.subplots(1)
-        ax.imshow(heatmap_on_image)
-        plt.show()
-
-        b = self.heatmap2box(heatmaps, offsets)
-        if len(b) > 0:
-            im_height, im_width = orig_image.shape[0], orig_image.shape[1]
-            b[:, 0], b[:, 2] = b[:, 0] * im_width, b[:, 2] * im_width
-            b[:, 1], b[:, 3] = b[:, 1] * im_height, b[:, 3] * im_height
-        fig, ax = plt.subplots(1)
-        ax.imshow(orig_image)
-        for k in range(b.shape[0]):
-            rect = patches.Rectangle((b[k, 0], b[k, 1]), b[k, 2] - 1 - b[k, 0],
-                                     b[k, 3] - 1 - b[k, 1], linewidth=2,
-                                     edgecolor='g', facecolor='none')
-            ax.add_patch(rect)
-        plt.show()
-        fig, ax = plt.subplots(1)
-        orig_depth = flowlib.visualize_disp(orig_depth)
-        ax.imshow(orig_depth)
-        for k in range(b.shape[0]):
-            rect = patches.Rectangle((b[k, 0], b[k, 1]), b[k, 2] - 1 - b[k, 0],
-                                     b[k, 3] - 1 - b[k, 1], linewidth=2,
-                                     edgecolor='w', facecolor='none')
-            ax.add_patch(rect)
-        plt.show()
-        fig, ax = plt.subplots(1)
-        orig_flow = flowlib.visualize_disp(orig_flow)
-        orig_flow = flowlib.visualize_flow(orig_flow)
-        ax.imshow(orig_flow)
-        for k in range(b.shape[0]):
-            rect = patches.Rectangle((b[k, 0], b[k, 1]), b[k, 2] - 1 - b[k, 0],
-                                     b[k, 3] - 1 - b[k, 1], linewidth=2,
-                                     edgecolor='k', facecolor='none')
-            ax.add_patch(rect)
-        plt.show()
-
+        return image_all.astype(np.uint8)
 
     @staticmethod
-    def visualize_heatmap_on_image(image, heatmap):
+    def visualize_image(image):
+        fig, ax = plt.subplots(1)
+        ax.imshow(on_image)
+        plt.show()
+
+    @staticmethod
+    def visualize_box_on_image(image, boxes, color):
+        fig, ax = plt.subplots(1)
+        ax.imshow(orig_image)
+        b = boxes
+        if len(b) > 0:
+            if np.max(b) < 1.01 and np.min(b) > -0.01:
+                im_height, im_width = image.shape[0], image.shape[1]
+                b[:, 0], b[:, 2] = b[:, 0] * im_width, b[:, 2] * im_width
+                b[:, 1], b[:, 3] = b[:, 1] * im_height, b[:, 3] * im_height
+            for k in range(b.shape[0]):
+                rect = patches.Rectangle((b[k, 0], b[k, 1]), b[k, 2] - 1 - b[k, 0],
+                                         b[k, 3] - 1 - b[k, 1], linewidth=2,
+                                         edgecolor=color, facecolor='none')
+                ax.add_patch(rect)
+        plt.show()
+
+    @staticmethod
+    def concat_heatmap_on_image(image, heatmap):
         im_height, im_width = image.shape[0], image.shape[1]
         heatmap = cv2.resize(heatmap, (im_width, im_height), interpolation=cv2.INTER_LINEAR)
         heatmap = np.dstack((heatmap, heatmap, heatmap))
@@ -532,7 +510,8 @@ class ToTensor(object):
                   'heatmaps': heatmaps, 'offsets': offsets}
         return sample
 
-data_path = '/mnt/project/yangyi05/kitti/training'
+# data_path = '/mnt/project/yangyi05/kitti/training'
+data_path = '/media/yi/DATA/data-orig/kitti/training'
 kitti_data = KittiData(data_path)
 train_dataset = KittiDataset(kitti_data.train_meta, [128], [384], 1, [16], [48],
                              data_augment=True)

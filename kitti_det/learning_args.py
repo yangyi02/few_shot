@@ -57,9 +57,9 @@ def parse_args():
 
     arg_parser.add_argument('--data_path', default='')
     arg_parser.add_argument('--image_name', default='')
-    arg_parser.add_argument('--box_name', default='')
     arg_parser.add_argument('--depth_name', default='')
     arg_parser.add_argument('--flow_name', default='')
+    arg_parser.add_argument('--box_name', default='')
     arg_parser.add_argument('--image_list', default='')
     arg_parser.add_argument('--figure_path', default='')
 
