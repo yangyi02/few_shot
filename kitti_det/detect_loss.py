@@ -1,6 +1,8 @@
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
+
+
 # Recommend
 class CrossEntropyLoss2d(nn.Module):
     def __init__(self, weight=None, size_average=True):
@@ -9,6 +11,7 @@ class CrossEntropyLoss2d(nn.Module):
 
     def forward(self, inputs, targets):
         return self.nll_loss(F.log_softmax(inputs), targets)
+
 
 # this may be unstable sometimes.Notice set the size_average
 def CrossEntropy2d(input, target, weight=None, size_average=False):
@@ -26,6 +29,7 @@ def CrossEntropy2d(input, target, weight=None, size_average=False):
         loss /= target_mask.sum().data[0]
 
     return loss
+
 
 # Define the Binary Cross Entropy loss function
 class BCELoss2d(nn.Module):
