@@ -41,6 +41,20 @@ class DetectInterface(object):
             self.model.load_state_dict(torch.load(self.init_model_path))
         return self.model
 
+    @staticmethod
+    def get_accuracy(pred_heatmap, heatmap):
+        acc, cnt = 0, 0
+        for i in range(len(heatmap)):
+            pred_label = pred_heatmap[i] > 0
+            acc = acc + (pred_label.int() == heatmap[i].int()).sum()
+            cnt = cnt + heatmap[i].numel()
+        mean_acc = acc.float() / cnt
+        base_acc = 0
+        for i in range(len(heatmap)):
+            base_acc = base_acc + (heatmap[i] < 0.5).int().sum()
+        base_acc = base_acc.float() / cnt
+        return mean_acc, base_acc
+
     def train(self):
         self.model.train()
         torch.set_grad_enabled(True)
@@ -48,7 +62,7 @@ class DetectInterface(object):
         criterion_conf = detect_loss.BCELoss2d()
         criterion_loc = detect_loss.MSELoss2d()
         optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
-        train_loss_all, train_acc_all = [], []
+        train_loss_all, train_acc_all, base_acc_all = [], [], []
         index, cnt = np.random.permutation(len(self.data.train_anno['img'])), 0
         for it in range(self.train_iter):
             im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, cnt, restart = \
@@ -72,9 +86,7 @@ class DetectInterface(object):
             loss.backward()
             optimizer.step()
 
-            for i in range(len(lb)):
-                pred_label = pred[i] > 0
-                acc = (pred_label.int() == lb[i].int()).sum().float() / lb[i].numel()
+            acc, base_acc = self.get_accuracy(pred, lb)
             writer.add_scalar('train_loss', loss, it)
             train_loss_all.append(loss)
             if len(train_loss_all) > 100:
@@ -87,6 +99,11 @@ class DetectInterface(object):
                 train_acc_all.pop(0)
             ave_train_acc = sum(train_acc_all) / float(len(train_acc_all))
             logging.info('iteration %d, train accuracy: %.4f, average train accuracy: %.4f', it, acc, ave_train_acc)
+            base_acc_all.append(base_acc)
+            if len(base_acc_all) > 100:
+                base_acc_all.pop(0)
+            ave_base_acc = sum(base_acc_all) / float(len(base_acc_all))
+            logging.info('iteration %d, base acc: %.4f, average base acc: %.4f', it, base_acc, ave_base_acc)
             if (it + 1) % self.save_interval == 0:
                 logging.info('iteration %d, saving model', it)
                 with open(self.save_model_path, 'w') as handle:
@@ -117,7 +134,7 @@ class DetectInterface(object):
         torch.set_grad_enabled(False)
         criterion_conf = detect_loss.BCELoss2d()
         criterion_loc = detect_loss.MSELoss2d()
-        test_loss_all, test_acc_all = [], []
+        test_loss_all, test_acc_all, base_acc_all = [], [], []
         index, cnt = np.random.permutation(len(self.data.test_anno['img'])), 0
         for it in range(self.test_iter):
             im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, cnt, _ = \
@@ -137,9 +154,7 @@ class DetectInterface(object):
                 mask = lb[i] > 0
                 mask = mask.float()
                 loss = loss + criterion_loc(pred_of[i], of[i], mask)
-            for i in range(len(lb)):
-                pred_label = pred[i] > 0
-                acc = (pred_label.int() == lb[i].int()).sum().float() / lb[i].numel()
+            acc, base_acc = self.get_accuracy(pred, lb)
 
             test_loss_all.append(loss)
             if len(test_loss_all) > 100:
@@ -147,11 +162,16 @@ class DetectInterface(object):
             test_acc_all.append(acc)
             if len(test_acc_all) > 100:
                 test_acc_all.pop(0)
+            base_acc_all.append(base_acc)
+            if len(base_acc_all) > 100:
+                base_acc_all.pop(0)
 
         test_loss = np.mean(np.array(test_loss_all))
         test_acc = np.mean(np.array(test_acc_all))
+        base_acc = np.mean(np.array(base_acc_all))
         logging.info('average test loss: %.4f', test_loss)
         logging.info('average test accuracy: %.4f', test_acc)
+        logging.info('average base accuracy: %.4f', base_acc)
         return test_loss, test_acc
 
     def test_all(self):
@@ -159,7 +179,7 @@ class DetectInterface(object):
         torch.set_grad_enabled(False)
         criterion_conf = detect_loss.BCELoss2d()
         criterion_loc = detect_loss.MSELoss2d()
-        test_loss_all, test_acc_all = [], []
+        test_loss_all, test_acc_all, base_acc_all = [], [], []
         cnt = 0
         while True:
             im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, cnt, restart = \
@@ -181,18 +201,21 @@ class DetectInterface(object):
                 mask = lb[i] > 0
                 mask = mask.float()
                 loss = loss + criterion_loc(pred_of[i], of[i], mask)
-            for i in range(len(lb)):
-                pred_label = pred[i] > 0
-                acc = (pred_label.int() == lb[i].int()).sum().float() / lb[i].numel()
+            acc, base_acc = self.get_accuracy(pred, lb)
 
             test_loss_all.append(loss)
             test_acc_all.append(acc)
-            logging.info('at batch %d, test loss: %.4f, test accuracy: %.4f', cnt, loss, acc)
+            base_acc_all.append(base_acc)
+            logging.info('at image %d, test loss: %.4f', cnt, loss)
+            logging.info('at image %d, test accuracy: %.4f', cnt, acc)
+            logging.info('at image %d, base accuracy: %.4f', cnt, base_acc)
 
         test_loss = np.mean(np.array(test_loss_all))
         test_acc = np.mean(np.array(test_acc_all))
+        base_acc = np.mean(np.array(base_acc_all))
         logging.info('overall average test loss: %.4f', test_loss)
         logging.info('overall average test accuracy: %.4f', test_acc)
+        logging.info('overall average base accuracy: %.4f', base_acc)
 
     def create_box_pair(self, pred_box, box):
         frames = []
@@ -441,9 +464,12 @@ class DetectInterface(object):
         assert(im_width == self.data.orig_im_size[1])
 
         # Plot original large image with bounding box
+        boxes = boxes[0]
         if len(boxes) > 0:
             b = boxes.copy()
             sc = b[:, 4]
+            b[:, 0], b[:, 2] = b[:, 0] * im_width, b[:, 2] * im_width
+            b[:, 1], b[:, 3] = b[:, 1] * im_width, b[:, 3] * im_width
             b = b.astype(np.int)
         else:
             b = []
