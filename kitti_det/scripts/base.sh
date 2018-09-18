@@ -45,28 +45,19 @@ OUTPUT_WIDTH=48
 NUM_SCALE=1
 NUM_CLASS=1
 
-# # Train
-# CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
-#   --exp_name=$EXP_NAME --model=$MODEL --data_path=$DATA_PATH \
-#   --batch_size=$BATCH_SIZE \
-#   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
-#   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
-#   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
-#   --train_proportion=$TRAIN_PROPORTION --train_iteration=$TRAIN_ITERATION \
-#   --test_interval=$TEST_INTERVAL --test_iteration=$TEST_ITERATION \
-#   --save_model_path=$MODEL_PATH --tensorboard_path=$TENSORBOARD_PATH \
-#   |& tee $LOG_PATH
-
-# Test
-echo "CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --test \
+# Train
+CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
   --exp_name=$EXP_NAME --model=$MODEL --data_path=$DATA_PATH \
   --batch_size=$BATCH_SIZE \
   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
-  --test_proportion=$TEST_PROPORTION \
-  --init_model_path=$MODEL_PATH \
-  |& tee -a $LOG_PATH"
+  --train_proportion=$TRAIN_PROPORTION --train_iteration=$TRAIN_ITERATION \
+  --test_interval=$TEST_INTERVAL --test_iteration=$TEST_ITERATION \
+  --save_model_path=$MODEL_PATH --tensorboard_path=$TENSORBOARD_PATH \
+  |& tee $LOG_PATH
+
+# Test
 CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --test \
   --exp_name=$EXP_NAME --model=$MODEL --data_path=$DATA_PATH \
   --batch_size=$BATCH_SIZE \

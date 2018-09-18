@@ -7,7 +7,6 @@ import matplotlib.patches as patches
 import flowlib
 import detect_loss
 from utils import nms
-from evaluation import detection_map
 
 import torch
 import torch.nn as nn
@@ -28,7 +27,7 @@ class DetectInterface(object):
         self.test_iter = test_iteration
         self.test_interval = test_interval
         self.save_interval = save_interval
-        self.best_test_loss = 1e10
+        self.best_test_acc = -1e10
         self.init_model_path = init_model_path
         self.save_model_path = save_model_path
         self.tensorboard_path = tensorboard_path
@@ -73,20 +72,30 @@ class DetectInterface(object):
             loss.backward()
             optimizer.step()
 
+            for i in range(len(lb)):
+                pred_label = pred[i] > 0
+                acc = (pred_label.int() == lb[i].int()).sum().float() / lb[i].numel()
             writer.add_scalar('train_loss', loss, it)
             train_loss_all.append(loss)
             if len(train_loss_all) > 100:
                 train_loss_all.pop(0)
             ave_train_loss = sum(train_loss_all) / float(len(train_loss_all))
-            logging.info('iteration %d, train loss: %.2f, average train loss: %.2f', it, loss, ave_train_loss)
+            logging.info('iteration %d, train loss: %.4f, average train loss: %.4f', it, loss, ave_train_loss)
+            writer.add_scalar('train_acc', acc, it)
+            train_acc_all.append(acc)
+            if len(train_acc_all) > 100:
+                train_acc_all.pop(0)
+            ave_train_acc = sum(train_acc_all) / float(len(train_acc_all))
+            logging.info('iteration %d, train accuracy: %.4f, average train accuracy: %.4f', it, acc, ave_train_acc)
             if (it + 1) % self.save_interval == 0:
                 logging.info('iteration %d, saving model', it)
                 with open(self.save_model_path, 'w') as handle:
                     torch.save(self.model.state_dict(), handle)
             if (it + 1) % self.test_interval == 0:
                 logging.info('iteration %d, testing', it)
-                test_loss = self.validate()
+                test_loss, test_acc = self.validate()
                 writer.add_scalar('test_loss', test_loss, it)
+                writer.add_scalar('test_acc', test_acc, it)
                 self.model.train()
                 torch.set_grad_enabled(True)
             if restart:
@@ -94,21 +103,21 @@ class DetectInterface(object):
         writer.close()
 
     def validate(self):
-        test_loss = self.test()
-        if test_loss <= self.best_test_loss:
+        test_loss, test_acc = self.test()
+        if test_acc >= self.best_test_acc:
             with open(self.save_model_path, 'w') as handle:
                 torch.save(self.model.state_dict(), handle)
             logging.info('model save to %s', self.save_model_path)
-            self.best_test_loss = test_loss
-        logging.info('current best test loss: %.2f', self.best_test_loss)
-        return test_loss
+            self.best_test_acc = test_acc
+        logging.info('current best test accuracy: %.4f', self.best_test_acc)
+        return test_loss, test_acc
 
     def test(self):
         self.model.eval()
         torch.set_grad_enabled(False)
         criterion_conf = detect_loss.BCELoss2d()
         criterion_loc = detect_loss.MSELoss2d()
-        test_loss_all, test_map_all = [], []
+        test_loss_all, test_acc_all = [], []
         index, cnt = np.random.permutation(len(self.data.test_anno['img'])), 0
         for it in range(self.test_iter):
             im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, cnt, _ = \
@@ -128,23 +137,29 @@ class DetectInterface(object):
                 mask = lb[i] > 0
                 mask = mask.float()
                 loss = loss + criterion_loc(pred_of[i], of[i], mask)
+            for i in range(len(lb)):
+                pred_label = pred[i] > 0
+                acc = (pred_label.int() == lb[i].int()).sum().float() / lb[i].numel()
 
             test_loss_all.append(loss)
             if len(test_loss_all) > 100:
                 test_loss_all.pop(0)
-
+            test_acc_all.append(acc)
+            if len(test_acc_all) > 100:
+                test_acc_all.pop(0)
 
         test_loss = np.mean(np.array(test_loss_all))
-        logging.info('average test loss: %.2f', test_loss)
-        return test_loss
+        test_acc = np.mean(np.array(test_acc_all))
+        logging.info('average test loss: %.4f', test_loss)
+        logging.info('average test accuracy: %.4f', test_acc)
+        return test_loss, test_acc
 
     def test_all(self):
-        mAP = detection_map.DetectionMAP(n_class=1)
         self.model.eval()
         torch.set_grad_enabled(False)
         criterion_conf = detect_loss.BCELoss2d()
         criterion_loc = detect_loss.MSELoss2d()
-        test_loss_all, test_map_all = [], []
+        test_loss_all, test_acc_all = [], []
         cnt = 0
         while True:
             im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, cnt, restart = \
@@ -166,27 +181,18 @@ class DetectInterface(object):
                 mask = lb[i] > 0
                 mask = mask.float()
                 loss = loss + criterion_loc(pred_of[i], of[i], mask)
+            for i in range(len(lb)):
+                pred_label = pred[i] > 0
+                acc = (pred_label.int() == lb[i].int()).sum().float() / lb[i].numel()
 
             test_loss_all.append(loss)
-            logging.info('at instance %d, test loss: %.2f', cnt, loss)
-
-            for i in range(len(pred)):
-                pred[i] = torch.sigmoid(pred[i])
-                pred[i] = pred[i].cpu().numpy()
-                pred_of[i] = pred_of[i].cpu().numpy()
-            pred_box = nms(pred, pred_of, self.data.orig_im_size[0], self.data.orig_im_size[1])
-            frames = self.create_box_pair(pred_box, box)
-            for frame in frames:
-                mAP.evaluate(*frame)
-            precision, recall = mAP.compute_precision_recall_(0, interpolated=True)
-            mean_ap = mAP.compute_ap(precision, recall)
-            test_map_all.append(mean_ap)
-            logging.info('at instance %d, test map: %.2f', cnt, mean_ap)
+            test_acc_all.append(acc)
+            logging.info('at batch %d, test loss: %.4f, test accuracy: %.4f', cnt, loss, acc)
 
         test_loss = np.mean(np.array(test_loss_all))
-        logging.info('overall average test loss: %.2f', test_loss)
-        test_map = np.mean(np.array(test_map_all))
-        logging.info('overall average mean ap: %.2f', test_map)
+        test_acc = np.mean(np.array(test_acc_all))
+        logging.info('overall average test loss: %.4f', test_loss)
+        logging.info('overall average test accuracy: %.4f', test_acc)
 
     def create_box_pair(self, pred_box, box):
         frames = []
