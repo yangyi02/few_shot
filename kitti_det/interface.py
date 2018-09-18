@@ -7,6 +7,7 @@ import matplotlib.patches as patches
 import flowlib
 import detect_loss
 from utils import nms
+from evaluation import detection_map
 
 import torch
 import torch.nn as nn
@@ -107,7 +108,7 @@ class DetectInterface(object):
         torch.set_grad_enabled(False)
         criterion_conf = detect_loss.BCELoss2d()
         criterion_loc = detect_loss.MSELoss2d()
-        test_loss_all, test_acc_all = [], []
+        test_loss_all, test_map_all = [], []
         index, cnt = np.random.permutation(len(self.data.test_anno['img'])), 0
         for it in range(self.test_iter):
             im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, cnt, _ = \
@@ -132,16 +133,18 @@ class DetectInterface(object):
             if len(test_loss_all) > 100:
                 test_loss_all.pop(0)
 
+
         test_loss = np.mean(np.array(test_loss_all))
         logging.info('average test loss: %.2f', test_loss)
         return test_loss
 
     def test_all(self):
+        mAP = detection_map.DetectionMAP(n_class=1)
         self.model.eval()
         torch.set_grad_enabled(False)
         criterion_conf = detect_loss.BCELoss2d()
         criterion_loc = detect_loss.MSELoss2d()
-        test_loss_all, test_acc_all = [], []
+        test_loss_all, test_map_all = [], []
         cnt = 0
         while True:
             im, orig_im, dp, orig_dp, fl, orig_fl, box, lb, of, cnt, restart = \
@@ -167,8 +170,35 @@ class DetectInterface(object):
             test_loss_all.append(loss)
             logging.info('at instance %d, test loss: %.2f', cnt, loss)
 
+            for i in range(len(pred)):
+                pred[i] = torch.sigmoid(pred[i])
+                pred[i] = pred[i].cpu().numpy()
+                pred_of[i] = pred_of[i].cpu().numpy()
+            pred_box = nms(pred, pred_of, self.data.orig_im_size[0], self.data.orig_im_size[1])
+            frames = self.create_box_pair(pred_box, box)
+            for frame in frames:
+                mAP.evaluate(*frame)
+            precision, recall = mAP.compute_precision_recall_(0, interpolated=True)
+            mean_ap = mAP.compute_ap(precision, recall)
+            test_map_all.append(mean_ap)
+            logging.info('at instance %d, test map: %.2f', cnt, mean_ap)
+
         test_loss = np.mean(np.array(test_loss_all))
         logging.info('overall average test loss: %.2f', test_loss)
+        test_map = np.mean(np.array(test_map_all))
+        logging.info('overall average mean ap: %.2f', test_map)
+
+    def create_box_pair(self, pred_box, box):
+        frames = []
+        for i in range(len(box)):
+            # print pred_box[i], box[i]
+            pred_bb = pred_box[i][:, 0:4]
+            pred_conf = pred_box[i][:, 4]
+            pred_cls = np.zeros((pred_bb.shape[0],))
+            gt_bb = box[i][:, 0:4]
+            gt_cls = np.zeros((gt_bb.shape[0],))
+            frames.append((pred_bb, pred_cls, pred_conf, gt_bb, gt_cls))
+        return frames
 
     def predict(self, image, depth, flow, label_map, offset):
         self.model.eval()

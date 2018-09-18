@@ -413,7 +413,7 @@ class KittiData(object):
                         offsets[i][n, y_c, x_c, 2] = box[k, 2] - x_c * 1.0 / ou_widths[i]
                         offsets[i][n, y_c, x_c, 3] = box[k, 3] - y_c * 1.0 / ou_heights[i]
             else:
-                boxes.append([])
+                boxes.append(np.zeros((0, 4)))
             cnt = cnt + 1
         for i in range(num_scale):
             images[i] = images[i].transpose((0, 3, 1, 2))
