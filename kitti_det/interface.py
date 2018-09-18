@@ -103,7 +103,7 @@ class DetectInterface(object):
             if len(base_acc_all) > 100:
                 base_acc_all.pop(0)
             ave_base_acc = sum(base_acc_all) / float(len(base_acc_all))
-            logging.info('iteration %d, base acc: %.4f, average base acc: %.4f', it, base_acc, ave_base_acc)
+            logging.info('iteration %d, base accuracy: %.4f, average base accuracy: %.4f', it, base_acc, ave_base_acc)
             if (it + 1) % self.save_interval == 0:
                 logging.info('iteration %d, saving model', it)
                 with open(self.save_model_path, 'w') as handle:
