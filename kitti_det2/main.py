@@ -5,6 +5,7 @@ from kitti_data import KittiData, KittiDataLoader
 from networks.base import BaseNet
 from networks.base_3d import Base3DNet
 from networks.base_2stream import Base2StreamNet
+from networks.seg_3d import Seg3DNet
 
 import logging
 logging.basicConfig(format='[%(levelname)s %(asctime)s %(filename)s:%(lineno)s] %(message)s',
@@ -37,6 +38,8 @@ def main():
         model = Base3DNet(args.image_channel, args.depth_channel, args.num_class)
     elif args.model == 'base_2stream':
         model = Base2StreamNet(args.image_channel, args.depth_channel, args.num_class)
+    elif args.model == 'seg_3d':
+        model = Seg3DNet(args.image_channel, args.depth_channel, args.num_class)
     else:
         print('Model not implemented yet')
         return
