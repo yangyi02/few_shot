@@ -84,6 +84,7 @@ class DetectInterface(object):
         torch.set_grad_enabled(True)
         writer = SummaryWriter(self.tensorboard_path)
         criterion_hm = detect_loss.BCELoss2d()
+        # criterion_hm = detect_loss.BCEWithLogitsLoss2d(pos_weight=torch.tensor(2.0).to(self.device))
         criterion_of = detect_loss.MSELoss2d()
         optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         train_loss_all, train_acc_all, base_acc_all = [], [], []
@@ -151,6 +152,7 @@ class DetectInterface(object):
         self.model.eval()
         torch.set_grad_enabled(False)
         criterion_hm = detect_loss.BCELoss2d()
+        # criterion_hm = detect_loss.BCEWithLogitsLoss2d(pos_weight=torch.tensor(2.0).to(self.device))
         criterion_of = detect_loss.MSELoss2d()
         test_loss_all, test_acc_all, base_acc_all = [], [], []
         self.test_dataloader.shuffle()
@@ -177,6 +179,7 @@ class DetectInterface(object):
         self.model.eval()
         torch.set_grad_enabled(False)
         criterion_hm = detect_loss.BCELoss2d()
+        # criterion_hm = detect_loss.BCEWithLogitsLoss2d(pos_weight=torch.tensor(2.0).to(self.device))
         criterion_of = detect_loss.MSELoss2d()
         test_loss_all, test_acc_all, base_acc_all = [], [], []
         for i in range(self.test_dataloader.num_batch):
@@ -203,6 +206,7 @@ class DetectInterface(object):
         torch.set_grad_enabled(False)
         pred_hm, pred_of = self.model(im, dp, fl)
         criterion_hm = detect_loss.BCELoss2d()
+        # criterion_hm = detect_loss.BCEWithLogitsLoss2d(pos_weight=torch.tensor(2.0).to(self.device))
         criterion_of = detect_loss.MSELoss2d()
         loss = self.get_loss(pred_hm, pred_of, hm, of, criterion_hm, criterion_of)
         acc, _ = self.get_accuracy(pred_hm, hm)

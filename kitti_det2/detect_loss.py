@@ -60,11 +60,10 @@ class BCEWithLogitsLoss2d(nn.Module):
         super(BCEWithLogitsLoss2d, self).__init__()
         self.bce_loss = nn.BCEWithLogitsLoss(weight=weight, reduction=reduction, pos_weight=pos_weight)
 
-    def forward(self, logits, targets):
-        probs = torch.sigmoid(logits)
-        probs_flat = probs.view(-1)
+    def forward(self, preds, targets):
+        preds_flat = preds.view(-1)
         targets_flat = targets.view(-1)
-        return self.bce_loss(probs_flat, targets_flat)
+        return self.bce_loss(preds_flat, targets_flat)
 
 
 # Define the Mean Square Error loss function with mask
