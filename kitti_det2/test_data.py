@@ -21,11 +21,6 @@ class DataTest(object):
 def main():
     args = parse_args()
     logging.info(args)
-    # args.data_path = '/media/yi/DATA/data-orig/kitti/training'
-    # args.image_name = '/media/yi/DATA/data-orig/kitti/training/image_2/007480.png'
-    # args.depth_name = '/media/yi/DATA/data-orig/kitti/training/disp_unsup/007480.png'
-    # args.flow_name = '/media/yi/DATA/data-orig/kitti/training/flow_unsup/007480.png'
-    # args.box_name = '/media/yi/DATA/data-orig/kitti/training/label_2/007480.txt'
 
     if args.data == 'kitti':
         data = KittiData(args.data_path, args.train_proportion, args.test_proportion)
