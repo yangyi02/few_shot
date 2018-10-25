@@ -48,17 +48,17 @@ NUM_CLASS=34
 TRAIN_FILE_LIST=$CODE_PATH/file_list/cityscape_train_files.txt
 TEST_FILE_LIST=$CODE_PATH/file_list/cityscape_val_files.txt
 
-# # Train
-# CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
-#   --exp_name=$EXP_NAME --model=$MODEL --train_file_list=$TRAIN_FILE_LIST \
-#   --test_file_list=$TEST_FILE_LIST --batch_size=$BATCH_SIZE \
-#   --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
-#   --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
-#   --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
-#   --train_proportion=$TRAIN_PROPORTION --train_epoch=$TRAIN_EPOCH \
-#   --test_interval=$TEST_INTERVAL --test_iteration=$TEST_ITERATION \
-#   --save_model_path=$MODEL_PATH --tensorboard_path=$TENSORBOARD_PATH \
-#   |& tee $LOG_PATH
+# Train
+CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --train \
+  --exp_name=$EXP_NAME --model=$MODEL --train_file_list=$TRAIN_FILE_LIST \
+  --test_file_list=$TEST_FILE_LIST --batch_size=$BATCH_SIZE \
+  --image_height=$IMAGE_HEIGHT --image_width=$IMAGE_WIDTH \
+  --output_height=$OUTPUT_HEIGHT --output_width=$OUTPUT_WIDTH \
+  --num_scale=$NUM_SCALE --num_class=$NUM_CLASS \
+  --train_proportion=$TRAIN_PROPORTION --train_epoch=$TRAIN_EPOCH \
+  --test_interval=$TEST_INTERVAL --test_iteration=$TEST_ITERATION \
+  --save_model_path=$MODEL_PATH --tensorboard_path=$TENSORBOARD_PATH \
+  |& tee $LOG_PATH
 
 # Test
 CUDA_VISIBLE_DEVICES=1 python $CODE_PATH/main.py --test \
