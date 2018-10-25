@@ -38,14 +38,6 @@ Our ultimate goal is to study how much depth and optical flow can help high leve
 2. Given an object keyword (i.e. "television") and a cluttered RGB image (with or without depth & optical flow), how is the localization accuracy improves?
 3. Given a few supervised training labels, how does the unsupervised depth & optical flow help recognition / localization / detection /segmentation accuracy?
 
-## Benchmark & Criteria
-We use the standard benchmark accuracy as the quantitative measure:
-1. The recognition benchmark is very simple, it is the classification accuracy.
-2. The localization benchmark is same as recognition, using key words (i.e. "top left") to represent a location and then use classification accuracy.
-3. We will further replace the localization problem to another word prediction problem (i.e. left, right, top, down, etc.), then we will merge the two tasks into one task which is word prediction (i.e. car, pedestrian or left, right). We will then use the word prediction accuracy as the final measure.
-4. The detection benchmark is the mean average precision, where a bounding box is considered as correct if its IoU with the ground truth box is over 50%. 
-5. The segmentation benchmark is the mean IoUs, which is the average intersection over union.
-
 ## Dataset
 We mainly use four datasets for experiments.
 1. [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/): This is the main dataset we use to study depth effect because they contain ground truth object semantic segmentation, instance segmentation, depth, etc. MLT dataset contains 45K synthetic 3D indoor scenes with 400K fully annotated rendered images from different viewpoints.
@@ -66,6 +58,14 @@ Some other dataset not used in the final experiments.
 | GT Flow | No | No | Yes | No |
 | # Train |10742 | 5984 | 1264 | 2975 | 
 | # Test | 4605 | 1497 | 317 | 500 |
+
+## Benchmark & Criteria
+We use the standard benchmark accuracy as the quantitative measure:
+1. The recognition benchmark is very simple, it is the classification accuracy.
+2. The localization benchmark is same as recognition, using key words (i.e. "top left") to represent a location and then use classification accuracy.
+3. We will further replace the localization problem to another word prediction problem (i.e. left, right, top, down, etc.), then we will merge the two tasks into one task which is word prediction (i.e. car, pedestrian or left, right). We will then use the word prediction accuracy as the final measure.
+4. The detection benchmark is the mean average precision, where a bounding box is considered as correct if its IoU with the ground truth box is over 50%. 
+5. The segmentation benchmark is the mean IoUs, which is the average intersection over union.
 
 ## Model
 We use different models on different tasks. In general, we use attention models for recognition and localization
