@@ -73,6 +73,8 @@ We use different models on different tasks. In general, we use attention models 
 
 ## Preliminary Results
 
+You can see the full preliminary results in [results.pdf](results.pdf).
+
 ### 5/3/2018
 - Summarize the performance of using the bounding box to align v.s. no aligned and using RGB + depth v.s. RGB only, on [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/) with 7000 training images and 700 testing images for 6 most frequent classes. 
 - Try to train a residual network to beat the previous VGG network, but residual network obtains worse performance on all different tasks. Need to figure out why.
