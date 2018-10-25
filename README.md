@@ -5,11 +5,12 @@
 - Python 2.x
 
 ## How to run the code
-You only need to use 4 folders (mlt_attn, viper, kitti_det2, cityscape) and they are all independent.
+You only need to use 4 folders (mlt_attn, viper, kitti_det, cityscape) and they are all independent.
 
-### kitti_det2:
+### kitti_det:
 1. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own kitti data and code path
 2. Go to `scripts` folder, run `bash base.sh`
+3. To run in cluster, go to `scripts_cluster` folder, run `bash base.sh`
 
 ### cityscape:
 1. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own cityscape data and code path
