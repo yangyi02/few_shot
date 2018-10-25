@@ -4,10 +4,30 @@
 - PyTorch >=0.4.0
 - Python 2.x
 
+## How to run the code
+You only need to use 4 folders (mlt_attn, viper, kitti_det2, cityscape) and they are all independent.
+
+### kitti_det2:
+1. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own kitti data and code path
+2. Go to `scripts` folder, run `base.sh`
+
+### cityscape:
+1. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own cityscape data and code path
+2. Go to `scripts` folder, run `base.sh`
+
+### vdrift:
+1. Go to `prepare` folder, open `create_seg_class.py` and  change `seg_path` and `seg_cls_path`, then run it. 
+2. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own vdrift data and code path.
+3. Go to `scripts` folder, run `base.sh`
+
+### mlt_attn:
+1. Open `mlt_data.py`, change `self.img_dir`, `self.depth_dir`, `self.box_dir` to your own mlt data path.
+2. Go to `exps`, run `base.sh` 
+
 ## Motivation
 Although deep neural networks have achieved promising results on visual recognition, human uses much fewer supervised training labels to reach to the same level performance. In this work, we study how much depth, optical flow help object recognition, localization, detection and segmentation in cluttered scenes, particularly when there are not enough training labels.
 - There is an intuition that depth can significantly help attention and detection for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the moving objects.
-- To obtain depth and flow, we use ground truth existed in the some datasets (MLT, VDrift). For other real world datasets (KITTI, CityScape), we use the unperfect unsupervisedly learned depth and optical flow estimation from [Joint Unsupervised Learning of Optical Flow and Depth by Watching Stereo Videos](https://arxiv.org/abs/1810.03654).
+- To obtain depth and flow, we use ground truth existed in the some datasets (i.e. [MLT](http://robots.princeton.edu/projects/2016/PBRS/), [VDrift](http://www.cvlibs.net/datasets/kitti/)). For other real world datasets ([KITTI](http://www.cvlibs.net/datasets/kitti/), [CityScape](https://www.cityscapes-dataset.com/)), we use the unperfect unsupervisedly learned depth and optical flow estimation from [Joint Unsupervised Learning of Optical Flow and Depth by Watching Stereo Videos](https://arxiv.org/abs/1810.03654).
 
 ## Problem Setting
 Our ultimate goal is to study how much depth and optical flow can help high level semantic level tasks such as object recognition, localization, detection and segmentation, particularly when there are not enough training data. Hence our problem setting is below:
@@ -41,13 +61,15 @@ Some other dataset not used in the final experiments.
 | Stereo | No | Yes | No | Yes |
 | GT Depth | Yes | No | Yes | No |
 | GT Flow | No | No | Yes | No |
-| # Train | | 5985 | 1265 | 2975 | 
-| # Test | | 1496 | 316 | 500 |
+| # Train |10743 | 5985 | 1265 | 2975 | 
+| # Test | 4604 | 1496 | 316 | 500 |
 
 ## Model
-We find it is straightforward to use the attention models to conduct the experiments. There are two variations of attention models: 
+We use different models on different tasks. In general, we use attention models for recognition and localization
+1. We find it is straightforward to use the attention models for recognition and localization. There are two variations of attention models: 
 (1) Hard attention models such as [Spatial Transformer Networks](http://torch.ch/blog/2015/09/07/spatial_transformers.html) and [Recurrent Model of Visual Attention](http://torch.ch/blog/2015/09/21/rmva.html).
 (2) Soft attention models such as [Show, Attend and Tell](http://kelvinxu.github.io/projects/capgen.html). In this work, we also study the effect of these two different attention models on the recognition and localization tasks.
+2. We use fully convolutional networks with skip connections upsampling for detection and segmentation.
 
 ## Preliminary Results
 
