@@ -1,13 +1,13 @@
-# Whether Unsupervised Learning Depth and Optical Flow can Help Few Shot Supervised Learning
+# Whether Unsupervised Depth and Optical Flow Help Few Shot Supervised Learning
 
 ## Requirement
-- PyTorch 0.3.1
+- PyTorch >=0.4.0
 - Python 2.x
 
 ## Motivation
-Although deep neural networks have achieved promising results on visual recognition, human uses far fewer supervised training labels to reach to the same level. In thie work, we study how much depth, optical flow and top-down keywords can help object recognition and localization in cluttered scenes, particularly when there are not enough training labels.
-- There is an intuition that depth can significantly help attention and recognition for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the correct region pointed by keywords.
-- For the depth and optical flow data, we simply use ground truth already existed in the datasets. In the next future, we will also study the unperfect unsupervisedly trained depth and optical flow estimation from [Other works](https://arxiv.org/abs/1711.05890).
+Although deep neural networks have achieved promising results on visual recognition, human uses much fewer supervised training labels to reach to the same level performance. In this work, we study how much depth, optical flow help object recognition, localization, detection and segmentation in cluttered scenes, particularly when there are not enough training labels.
+- There is an intuition that depth can significantly help attention and detection for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the moving objects.
+- To obtain depth and flow, we use ground truth existed in the some datasets (MLT, VDrift, VIPER). For other real world datasets (KITTI, CityScape), we use the unperfect unsupervisedly learned depth and optical flow estimation from [Joint Unsupervised Learning of Optical Flow and Depth by Watching Stereo Videos](https://arxiv.org/abs/1810.03654).
 
 ## Problem Setting
 Our ultimate goal is to study how much depth and optical flow can help high level semantic level tasks such as object recognition and localization, particularly when there are not enough training data. Hence our problem setting is below:
