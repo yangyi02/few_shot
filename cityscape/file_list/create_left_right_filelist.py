@@ -13,7 +13,7 @@ left_image_dir = os.path.join(cityscape_dir, left_image_name)
 right_image_dir = os.path.join(cityscape_dir, right_image_name)
 disparity_dir = os.path.join(cityscape_dir, disparity_name)
 segmentation_dir = os.path.join(cityscape_dir, segmentation_name)
-status_list = ['train', 'val', 'test']
+status_list = ['train', 'val']
 
 for status in status_list:
     output_file = 'left_right_' + status + '_files.txt'

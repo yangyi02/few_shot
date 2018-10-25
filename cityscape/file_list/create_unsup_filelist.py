@@ -15,7 +15,7 @@ right_image_dir = os.path.join(cityscape_dir, right_image_name)
 disparity_dir = os.path.join(cityscape_dir, disparity_name)
 flow_dir = os.path.join(cityscape_dir, flow_name)
 segmentation_dir = os.path.join(cityscape_dir, segmentation_name)
-status_list = ['train', 'val', 'test']
+status_list = ['train', 'val']
 
 for status in status_list:
     output_file = 'unsup_' + status + '_files.txt'

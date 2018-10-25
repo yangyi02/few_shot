@@ -48,11 +48,13 @@ class CityScapeData(object):
             line = line.strip().split(' ')
             meta['image'].append(line[0])
             meta['depth'].append(line[1])
-            meta['seg'].append(line[2])
+            meta['flow'].append(line[2])
+            meta['seg'].append(line[3])
         num_image = len(meta['image'])
         sample_interval = int(1.0 / self.proportion)
         meta['image'] = meta['image'][0:num_image:sample_interval]
         meta['depth'] = meta['depth'][0:num_image:sample_interval]
+        meta['flow'] = meta['flow'][0:num_image:sample_interval]
         meta['seg'] = meta['seg'][0:num_image:sample_interval]
         return meta
 
@@ -78,6 +80,11 @@ class CityScapeData(object):
             image = np.array(Image.open(self.meta['image'][data_idx]))
             image = image / 255.0
             depth = flowlib.read_disp_png(self.meta['depth'][data_idx])
+            flow = flowlib.read_flow_png(self.meta['flow'][data_idx])
+            flow = flow[:, :, 0:2]
+            if flow.shape[0] < self.orig_im_size[0]:
+                pad_length = self.orig_im_size[0] - flow.shape[0]
+                flow = np.pad(flow, ((pad_length, 0), (0, 0), (0, 0)), 'constant')
             seg = np.array(Image.open(self.meta['seg'][data_idx]))
 
             if self.data_augment:
@@ -88,8 +95,8 @@ class CityScapeData(object):
                                                    interpolation=cv2.INTER_AREA)
                 depths[i][n, :, :, 0] = cv2.resize(depth, (im_widths[i], im_heights[i]),
                                                    interpolation=cv2.INTER_AREA)
-                # flows[i][n, :, :, :] = cv2.resize(flow, (im_widths[i], im_heights[i]),
-                #                                   interpolation=cv2.INTER_AREA)
+                flows[i][n, :, :, :] = cv2.resize(flow, (im_widths[i], im_heights[i]),
+                                                  interpolation=cv2.INTER_AREA)
             label[n, :, :] = cv2.resize(seg, (ou_width, ou_height),
                                         interpolation=cv2.INTER_NEAREST)
         sample = {'images': images, 'depths': depths, 'flows': flows, 'seg': label}
@@ -112,13 +119,18 @@ class CityScapeData(object):
         ou_height, ou_width = self.output_height, self.output_width
         images = [np.zeros((batch_size, im_heights[i], im_widths[i], 3)) for i in range(num_scale)]
         depths = [np.zeros((batch_size, im_heights[i], im_widths[i], 1)) for i in range(num_scale)]
-        flows = [np.zeros((batch_size, im_heights[i], im_widths[i], 3)) for i in range(num_scale)]
+        flows = [np.zeros((batch_size, im_heights[i], im_widths[i], 2)) for i in range(num_scale)]
         label = np.zeros((batch_size, ou_height, ou_width))
 
         for n in range(batch_size):
             image = np.array(Image.open(image_name))
             image = image / 255.0
             depth = flowlib.read_disp_png(depth_name)
+            flow = flowlib.read_flow_png(flow_name)
+            flow = flow[:, :, 0:2]
+            if flow.shape[0] < self.orig_im_size[0]:
+                pad_length = self.orig_im_size[0] - flow.shape[0]
+                flow = np.pad(flow, ((pad_length, 0), (0, 0), (0, 0)), 'constant')
             seg = np.array(Image.open(seg_name))
 
             for i in range(num_scale):
@@ -126,8 +138,8 @@ class CityScapeData(object):
                                                    interpolation=cv2.INTER_AREA)
                 depths[i][0, :, :, 0] = cv2.resize(depth, (im_widths[i], im_heights[i]),
                                                    interpolation=cv2.INTER_AREA)
-                # flows[i][0, :, :, :] = cv2.resize(flow, (im_widths[i], im_heights[i]),
-                #                                   interpolation=cv2.INTER_AREA)
+                flows[i][0, :, :, :] = cv2.resize(flow, (im_widths[i], im_heights[i]),
+                                                  interpolation=cv2.INTER_AREA)
             label[0, :, :] = cv2.resize(seg, (ou_width, ou_height),
                                         interpolation=cv2.INTER_NEAREST)
         sample = {'images': images, 'flows': flows, 'depths': depths, 'seg': label}
