@@ -61,8 +61,8 @@ Some other dataset not used in the final experiments.
 | Stereo | No | Yes | No | Yes |
 | GT Depth | Yes | No | Yes | No |
 | GT Flow | No | No | Yes | No |
-| # Train |10743 | 5985 | 1265 | 2975 | 
-| # Test | 4604 | 1496 | 316 | 500 |
+| # Train |10743 | 5984 | 1265 | 2975 | 
+| # Test | 4604 | 1497 | 316 | 500 |
 
 ## Model
 We use different models on different tasks. In general, we use attention models for recognition and localization
