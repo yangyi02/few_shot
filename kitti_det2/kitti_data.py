@@ -170,8 +170,6 @@ class KittiDataLoader(object):
                 for i in range(num_scale):
                     if wb[k] < 2.0 / ou_widths[i] or hb[k] < 2.0 / ou_heights[i]:
                         continue
-                    # if wb[k] > 4.0 / ou_widths[i] and hb[k] > 4.0 / ou_heights[i]:
-                    #     continue
 
                     x = np.int(np.floor(xb[k] * ou_widths[i]))
                     y = np.int(np.floor(yb[k] * ou_heights[i]))
@@ -348,8 +346,6 @@ class KittiDataLoader(object):
                 for i in range(num_scale):
                     if wb[k] < 2.0 / ou_widths[i] or hb[k] < 2.0 / ou_heights[i]:
                         continue
-                    # if wb[k] > 4.0 / ou_widths[i] and hb[k] > 4.0 / ou_heights[i]:
-                    #     continue
 
                     x = np.int(np.floor(xb[k] * ou_widths[i]))
                     y = np.int(np.floor(yb[k] * ou_heights[i]))
