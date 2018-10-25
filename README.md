@@ -7,26 +7,42 @@
 ## Motivation
 Although deep neural networks have achieved promising results on visual recognition, human uses much fewer supervised training labels to reach to the same level performance. In this work, we study how much depth, optical flow help object recognition, localization, detection and segmentation in cluttered scenes, particularly when there are not enough training labels.
 - There is an intuition that depth can significantly help attention and detection for objects in clutted scenes. There is also another intuition that optical flow can help to attention to the moving objects.
-- To obtain depth and flow, we use ground truth existed in the some datasets (MLT, VDrift, VIPER). For other real world datasets (KITTI, CityScape), we use the unperfect unsupervisedly learned depth and optical flow estimation from [Joint Unsupervised Learning of Optical Flow and Depth by Watching Stereo Videos](https://arxiv.org/abs/1810.03654).
+- To obtain depth and flow, we use ground truth existed in the some datasets (MLT, VDrift). For other real world datasets (KITTI, CityScape), we use the unperfect unsupervisedly learned depth and optical flow estimation from [Joint Unsupervised Learning of Optical Flow and Depth by Watching Stereo Videos](https://arxiv.org/abs/1810.03654).
 
 ## Problem Setting
-Our ultimate goal is to study how much depth and optical flow can help high level semantic level tasks such as object recognition and localization, particularly when there are not enough training data. Hence our problem setting is below:
-1. Given a direction keyword and a cluttered RGB image (with depth & optical flow), how is the recognition accuracy?
-2. Given an object keyword and a cluttered RGB image (with depth & optical flow), how is the localization accuracy?
-3. Given a few supervised training labels, how does the unsupervised (depth & optical flow) help recognition / localization accuracy?
+Our ultimate goal is to study how much depth and optical flow can help high level semantic level tasks such as object recognition, localization, detection and segmentation, particularly when there are not enough training data. Hence our problem setting is below:
+1. Given a direction keyword (i.e. "top left") and a cluttered RGB image (with or without depth & optical flow), how is the recognition accuracy improves?
+2. Given an object keyword (i.e. "television") and a cluttered RGB image (with or without depth & optical flow), how is the localization accuracy improves?
+3. Given a few supervised training labels, how does the unsupervised depth & optical flow help recognition / localization / detection /segmentation accuracy?
 
 ## Benchmark & Criteria
-We use the average recognition accuracy and localization accuracy as the quantitative measure:
-1. The recognition accuracy is very simple, it is the same as the imagenet top-1 accuracy.
-2. The localization accuracy is the average proportion of correctly predicted bounding box, where a bounding box is considered as correct if its IoU with the ground truth box is over 50%. 
+We use the standard benchmark accuracy as the quantitative measure:
+1. The recognition benchmark is very simple, it is the classification accuracy.
+2. The localization benchmark is same as recognition, using key words (i.e. "top left") to represent a location and then use classification accuracy.
 3. We will further replace the localization problem to another word prediction problem (i.e. left, right, top, down, etc.), then we will merge the two tasks into one task which is word prediction (i.e. car, pedestrian or left, right). We will then use the word prediction accuracy as the final measure.
+4. The detection benchmark is the mean average precision, where a bounding box is considered as correct if its IoU with the ground truth box is over 50%. 
+5. The segmentation benchmark is the mean IoUs, which is the average intersection over union.
 
 ## Dataset
 We mainly use four datasets for experiments.
+1. [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/): This is the main dataset we use to study depth effect because they contain ground truth object semantic segmentation, instance segmentation, depth, etc. MLT dataset contains 45K synthetic 3D indoor scenes with 400K fully annotated rendered images from different viewpoints.
+2. [KITTI dataset](http://www.cvlibs.net/datasets/kitti/): This is one standard dataset to use for detection evaluation. It also evaluates depth and flow.
+3. [VDrift dataset](http://campar.in.tum.de/Chair/ProjectSyntheticDataset): This is a synthetic dataset for semantic segmentation with ground truth depth and flow. 
+4. [CityScape dataset](https://www.cityscapes-dataset.com/): This is another standard dataset to use for segmentation evaluation. It does not contain depth and flow.
+
+Some other dataset not used in the final experiments. 
 1. [Mnist dataset](http://yann.lecun.com/exdb/mnist/): This is simply for debug model and code.
-2. [MLT dataset](http://robots.princeton.edu/projects/2016/PBRS/): This is the main dataset we use to study depth effect because they contain ground truth object semantic segmentation, instance segmentation, depth, etc. MLT dataset contains 45K synthetic 3D indoor scenes with 400K fully annotated rendered images from different viewpoints.
-3. [VIPER dataset](http://playing-for-benchmarks.org/): This is the other main dataset we use to study optical flow effect because they contain ground truth object semantic segmentation, instance segmentation, optical flow, etc. VIPER dataset contains 250K fully annotated high resolution video frames.
-4. [KITTI dataset](http://www.cvlibs.net/datasets/kitti/): This is the final dataset we are planning to use. But so far for simplisity, we haven't used it yet.
+2. [VIPER dataset](http://playing-for-benchmarks.org/): This is the other main dataset we use to study optical flow effect because they contain ground truth object semantic segmentation, instance segmentation, optical flow, etc. VIPER dataset contains 250K fully annotated high resolution video frames.
+
+| Datast | MLT | KITTI | VDrift | CityScape |
+| ------ | ------ | ------ | ------ | ------ | 
+| Task   | Recognition / Localization | Detection | Segmentation | Segmentation |
+| Data   | RGB + D | RGB | RGB + D + F | RGB |
+| Stereo | No | Yes | No | Yes |
+| GT Depth | Yes | No | Yes | No |
+| GT Flow | No | No | Yes | No |
+| # Train | | 5985 | 1265 | 2975 | 
+| # Test | | 1496 | 316 | 500 |
 
 ## Model
 We find it is straightforward to use the attention models to conduct the experiments. There are two variations of attention models: 
