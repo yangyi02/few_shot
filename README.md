@@ -9,20 +9,20 @@ You only need to use 4 folders (mlt_attn, viper, kitti_det2, cityscape) and they
 
 ### kitti_det2:
 1. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own kitti data and code path
-2. Go to `scripts` folder, run `base.sh`
+2. Go to `scripts` folder, run `bash base.sh`
 
 ### cityscape:
 1. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own cityscape data and code path
-2. Go to `scripts` folder, run `base.sh`
+2. Go to `scripts` folder, run `bash base.sh`
 
 ### vdrift:
 1. Go to `prepare` folder, open `create_seg_class.py` and  change `seg_path` and `seg_cls_path`, then run it. 
 2. Open `set_env.sh`, change `DATA_PATH` and `CODE_PATH` to your own vdrift data and code path.
-3. Go to `scripts` folder, run `base.sh`
+3. Go to `scripts` folder, run `bash base.sh`
 
 ### mlt_attn:
 1. Open `mlt_data.py`, change `self.img_dir`, `self.depth_dir`, `self.box_dir` to your own mlt data path.
-2. Go to `exps`, run `base.sh` 
+2. Go to `exps`, run `bash base.sh` 
 
 ## Motivation
 Although deep neural networks have achieved promising results on visual recognition, human uses much fewer supervised training labels to reach to the same level performance. In this work, we study how much depth, optical flow help object recognition, localization, detection and segmentation in cluttered scenes, particularly when there are not enough training labels.
